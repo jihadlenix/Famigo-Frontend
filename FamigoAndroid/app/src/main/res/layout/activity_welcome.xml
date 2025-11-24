@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <ImageView
+        android:id="@+id/welcomeImg"
+        android:layout_width="260dp"
+        android:layout_height="260dp"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/famigo_welcome"
+        android:onClick="null"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.18"/>
+
+    <!-- If famigo_welcome is missing, temporarily set:
+         android:src="@android:drawable/ic_menu_gallery"
+         to avoid crash. Make sure you add the real PNG later. -->
+
+    <TextView
+        android:id="@+id/title"
+        style="@style/FamigoTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Famigo Connect"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/welcomeImg"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <Button
+        android:id="@+id/goLoginBtn"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:text="Log In"
+        android:textAllCaps="false"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:background="@drawable/bg_primary_button"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginTop="28dp"
+        app:layout_constraintTop_toBottomOf="@id/title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <Button
+        android:id="@+id/goSignupBtn"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:text="Sign Up"
+        android:textAllCaps="false"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:background="@drawable/bg_social_button"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintTop_toBottomOf="@id/goLoginBtn"
+        app:layout_constraintStart_toStartOf="@id/goLoginBtn"
+        app:layout_constraintEnd_toEndOf="@id/goLoginBtn"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,12 @@
+<resources>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#111111</color>
+
+    <!-- Figma-like green -->
+    <color name="famigo_green">#8FC9A6</color>
+    <color name="famigo_green_dark">#78B892</color>
+
+    <!-- Input background + muted text -->
+    <color name="input_bg">#F2F4F7</color>
+    <color name="muted_text">#9AA0A6</color>
+</resources>
