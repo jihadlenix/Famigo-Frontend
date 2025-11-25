@@ -22,6 +22,7 @@
         <activity android:name=".ui.family.HomeActivity" />
         <activity android:name=".ui.family.RegisterFamilyActivity" />
         <activity android:name=".ui.family.JoinFamilyActivity" />
+        <activity android:name=".ui.rewards.StoreActivity" />
 
         <activity
             android:name=".ui.auth.WelcomeActivity"

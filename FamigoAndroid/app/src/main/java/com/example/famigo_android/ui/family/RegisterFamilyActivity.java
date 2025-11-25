@@ -1,5 +1,6 @@
 package com.example.famigo_android.ui.family;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -10,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.famigo_android.R;
 import com.example.famigo_android.data.family.FamilyOut;
 import com.example.famigo_android.data.family.FamilyRepository;
+import com.example.famigo_android.ui.rewards.StoreActivity;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -42,12 +44,22 @@ public class RegisterFamilyActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<FamilyOut> call, Response<FamilyOut> response) {
                     if (response.isSuccessful() && response.body() != null) {
+
+                        FamilyOut fam = response.body();
+
                         Toast.makeText(RegisterFamilyActivity.this,
-                                "Family created. Secret code: " + response.body().secret_code,
+                                "Family created. Secret code: " + fam.secret_code,
                                 Toast.LENGTH_LONG).show();
+
+                        // ⭐ DIRECTLY OPEN STORE PAGE
+                        Intent i = new Intent(RegisterFamilyActivity.this, StoreActivity.class);
+                        i.putExtra("FAMILY_ID", fam.id);
+                        startActivity(i);
+
                         finish();
                     } else {
-                        Toast.makeText(RegisterFamilyActivity.this, "Failed to create family", Toast.LENGTH_LONG).show();
+                        Toast.makeText(RegisterFamilyActivity.this,
+                                "Failed to create family", Toast.LENGTH_LONG).show();
                     }
                 }
 

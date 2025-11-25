@@ -1,5 +1,6 @@
 package com.example.famigo_android.ui.family;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -10,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.famigo_android.R;
 import com.example.famigo_android.data.family.FamilyRepository;
 import com.example.famigo_android.data.family.MemberOut;
+import com.example.famigo_android.ui.rewards.StoreActivity;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -42,7 +44,15 @@ public class JoinFamilyActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<MemberOut> call, Response<MemberOut> response) {
                     if (response.isSuccessful() && response.body() != null) {
+
+                        MemberOut member = response.body();
                         Toast.makeText(JoinFamilyActivity.this, "Joined family!", Toast.LENGTH_LONG).show();
+
+                        // OPEN STORE PAGE
+                        Intent i = new Intent(JoinFamilyActivity.this, StoreActivity.class);
+                        i.putExtra("FAMILY_ID", member.family_id);
+                        startActivity(i);
+
                         finish();
                     } else {
                         Toast.makeText(JoinFamilyActivity.this, "Invalid code", Toast.LENGTH_LONG).show();
