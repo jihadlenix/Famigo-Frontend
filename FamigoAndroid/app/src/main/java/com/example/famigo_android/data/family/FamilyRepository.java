@@ -5,6 +5,8 @@ import android.content.Context;
 import com.example.famigo_android.data.auth.TokenStore;
 import com.example.famigo_android.data.network.ApiClient;
 
+import java.util.List;
+
 import retrofit2.Call;
 
 public class FamilyRepository {
@@ -29,4 +31,8 @@ public class FamilyRepository {
     public Call<MemberOut> joinSecret(String code){
         return api.joinBySecret(bearer(), code.trim().toUpperCase());
     }
+    public Call<List<FamilyOut>> getMyFamilies() {
+        return api.getMyFamilies(bearer());
+    }
+
 }

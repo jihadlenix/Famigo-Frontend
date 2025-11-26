@@ -26,4 +26,13 @@ public class TokenStore {
     public void clear() {
         prefs.edit().clear().apply();
     }
+
+    public void saveFamilyId(String id) {
+        prefs.edit().putString("current_family_id", id).apply();
+    }
+
+    public String getFamilyId() {
+        return prefs.getString("current_family_id", null);
+    }
+
 }

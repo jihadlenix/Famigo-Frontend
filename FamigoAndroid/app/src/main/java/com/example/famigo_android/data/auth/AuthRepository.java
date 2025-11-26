@@ -16,8 +16,9 @@ public class AuthRepository {
         store = new TokenStore(ctx);
     }
 
-    public Call<UserOut> signup(String fullName, String email, String password) {
-        SignupRequest req = new SignupRequest(email, password, null, fullName);
+    // 🔥 UPDATED — now includes username between fullName and email
+    public Call<UserOut> signup(String fullName, String username, String email, String password) {   // ✅ added username parameter
+        SignupRequest req = new SignupRequest(email, password, username, fullName);   // ✅ username supplied instead of null
         return api.signup(req);
     }
 
@@ -34,5 +35,13 @@ public class AuthRepository {
 
     public TokenStore getStore() {
         return store;
+    }
+    // ⭐ NEW — makes your life easier
+    public String getAccessToken() {
+        return store.getAccessToken();
+    }
+
+    public String getBearerToken() {
+        return "Bearer " + store.getAccessToken();
     }
 }

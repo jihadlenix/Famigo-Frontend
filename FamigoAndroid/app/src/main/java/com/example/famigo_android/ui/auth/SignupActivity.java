@@ -19,6 +19,7 @@ import retrofit2.Response;
 public class SignupActivity extends AppCompatActivity {
 
     private EditText fullNameEt, emailEt, passwordEt, confirmPasswordEt;
+    private EditText usernameEt;   // ✅ added username field
     private CheckBox termsCheck;
     private Button signupBtn;
     private AuthRepository repo;
@@ -31,6 +32,7 @@ public class SignupActivity extends AppCompatActivity {
         repo = new AuthRepository(this);
 
         fullNameEt = findViewById(R.id.fullNameEt);
+        usernameEt = findViewById(R.id.usernameEt);   // ✅ added
         emailEt = findViewById(R.id.emailEt);
         passwordEt = findViewById(R.id.passwordEt);
         confirmPasswordEt = findViewById(R.id.confirmPasswordEt);
@@ -39,6 +41,7 @@ public class SignupActivity extends AppCompatActivity {
 
         signupBtn.setOnClickListener(v -> {
             String fullName = fullNameEt.getText().toString().trim();
+            String username = usernameEt.getText().toString().trim();   // ✅ added
             String email = emailEt.getText().toString().trim();
             String pass = passwordEt.getText().toString();
             String confirm = confirmPasswordEt.getText().toString();
@@ -47,7 +50,7 @@ public class SignupActivity extends AppCompatActivity {
                 Toast.makeText(this, "You must accept the terms", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (fullName.isEmpty() || email.isEmpty() || pass.isEmpty() || confirm.isEmpty()) {
+            if (fullName.isEmpty() || username.isEmpty() || email.isEmpty() || pass.isEmpty() || confirm.isEmpty()) {   // ✅ added username validation
                 Toast.makeText(this, "Fill all fields", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -56,7 +59,8 @@ public class SignupActivity extends AppCompatActivity {
                 return;
             }
 
-            repo.signup(fullName, email, pass).enqueue(new Callback<UserOut>() {
+            // 🔥 Corrected signup call, now includes username
+            repo.signup(fullName, username, email, pass).enqueue(new Callback<UserOut>() {   // ✅ updated
                 @Override
                 public void onResponse(Call<UserOut> call, Response<UserOut> response) {
                     if (response.isSuccessful()) {

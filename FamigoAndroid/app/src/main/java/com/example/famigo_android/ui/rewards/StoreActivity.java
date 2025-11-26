@@ -1,7 +1,9 @@
 package com.example.famigo_android.ui.rewards;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -11,9 +13,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.famigo_android.R;
+import com.example.famigo_android.data.auth.TokenStore;
 import com.example.famigo_android.data.rewards.RewardOut;
 import com.example.famigo_android.data.rewards.RewardRepository;
 import com.example.famigo_android.data.rewards.SimpleRedeemResponse;
+import com.example.famigo_android.ui.tasks.TasksDashboardActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -34,10 +38,46 @@ public class StoreActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_store);
 
+
+        ImageButton navHome = findViewById(R.id.nav_home);
+        ImageButton navMessages = findViewById(R.id.nav_messages);
+        ImageButton navProfile = findViewById(R.id.nav_profile);
+
+// highlight the active icon
+        navMessages.setColorFilter(getColor(R.color.text_primary));
+        navHome.setColorFilter(getColor(R.color.text_secondary));
+        navProfile.setColorFilter(getColor(R.color.text_secondary));
+
+        navHome.setOnClickListener(v -> {
+            Intent i = new Intent(StoreActivity.this, TasksDashboardActivity.class);
+            i.putExtra("FAMILY_ID", familyId);  // 🔥 ADD THIS LINE
+            startActivity(i);
+        });
+
+        navMessages.setOnClickListener(v -> {
+            // We are already in store, do nothing
+        });
+
+
+
         repo = new RewardRepository(this);
 
         // TODO: get this from the place where family was created/joined
         familyId = getIntent().getStringExtra("FAMILY_ID");
+        if (familyId == null) {
+            // fallback to stored family ID
+            TokenStore store = new TokenStore(this);
+            familyId = store.getFamilyId();
+        }
+
+        if (familyId == null) {
+            Toast.makeText(this, "Family ID missing!", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+
+// ALWAYS SAVE IT
+        new TokenStore(this).saveFamilyId(familyId);
 
         RecyclerView recycler = findViewById(R.id.rewardsRecyclerView);
         recycler.setLayoutManager(new LinearLayoutManager(this));

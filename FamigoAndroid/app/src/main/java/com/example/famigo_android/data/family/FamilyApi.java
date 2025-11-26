@@ -1,7 +1,10 @@
 package com.example.famigo_android.data.family;
 
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -21,4 +24,9 @@ public interface FamilyApi {
             @Header("Authorization") String bearer,
             @Path("code") String code
     );
+    @GET("/families/my")
+    Call<List<FamilyOut>> getMyFamilies(
+            @Header("Authorization") String bearer
+    );
+
 }

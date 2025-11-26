@@ -12,7 +12,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.famigo_android.R;
 import com.example.famigo_android.data.auth.AuthRepository;
 import com.example.famigo_android.data.auth.TokenOut;
-import com.example.famigo_android.ui.family.HomeActivity;
+import com.example.famigo_android.data.auth.TokenStore;
+import com.example.famigo_android.data.family.FamilyOut;
+import com.example.famigo_android.data.family.FamilyRepository;
+import com.example.famigo_android.ui.family.RegisterFamilyActivity;
+import com.example.famigo_android.ui.rewards.StoreActivity;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -24,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private Button loginBtn;
     private TextView toSignupBtn;
     private AuthRepository repo;
+    private FamilyRepository familyRepo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         repo = new AuthRepository(this);
+        familyRepo = new FamilyRepository(this);
 
         emailEt = findViewById(R.id.emailEt);
         passwordEt = findViewById(R.id.passwordEt);
@@ -52,10 +60,7 @@ public class MainActivity extends AppCompatActivity {
                     if (response.isSuccessful() && response.body() != null) {
 
                         repo.persistTokens(response.body());
-
-                        Intent i = new Intent(MainActivity.this, HomeActivity.class);
-                        startActivity(i);
-                        finish();
+                        checkUserFamilies();  // 🔥 NEW LOGIC
 
                     } else {
                         Toast.makeText(MainActivity.this, "Incorrect credentials", Toast.LENGTH_LONG).show();
@@ -72,5 +77,39 @@ public class MainActivity extends AppCompatActivity {
         toSignupBtn.setOnClickListener(v ->
                 startActivity(new Intent(MainActivity.this, SignupActivity.class))
         );
+    }
+
+    private void checkUserFamilies() {
+        familyRepo.getMyFamilies().enqueue(new Callback<List<FamilyOut>>() {
+            @Override
+            public void onResponse(Call<List<FamilyOut>> call, Response<List<FamilyOut>> response) {
+
+                if (!response.isSuccessful() || response.body() == null) {
+                    Toast.makeText(MainActivity.this, "Failed to load families", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                List<FamilyOut> families = response.body();
+                TokenStore tokenStore = new TokenStore(MainActivity.this);
+
+                if (families.size() == 0) {
+                    Intent i = new Intent(MainActivity.this, RegisterFamilyActivity.class);
+                    startActivity(i);
+                    finish();
+                } else {
+                    tokenStore.saveFamilyId(families.get(0).id);
+
+                    Intent i = new Intent(MainActivity.this, StoreActivity.class);
+                    i.putExtra("FAMILY_ID", families.get(0).id);
+                    startActivity(i);
+                    finish();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<FamilyOut>> call, Throwable t) {
+                Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

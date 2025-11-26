@@ -1,3 +1,55 @@
 <resources>
     <string name="app_name">Famigo-Android</string>
+
+
+    <!-- Header -->
+    <string name="task_dashboard">Task Dashboard</string>
+    <!--    <string name="add_task">Add Task</string>-->
+    <string name="search">Search</string>
+
+    <!-- Coins -->
+    <string name="coins">Coins</string>
+    <string name="coins_1250">1,250</string>
+
+    <!-- My Tasks -->
+    <string name="my_tasks">My Tasks</string>
+    <string name="design_mockups_review">Design Mockups Review</string>
+    <string name="deadline_2024_07_22">Deadline: 2024-07-22</string>
+    <string name="points_1000">1000</string>
+    <string name="assigned_alex">Assigned: Alex</string>
+
+    <!-- Family Tasks -->
+    <string name="family_tasks">Family Tasks</string>
+
+    <!-- Navigation -->
+    <string name="home">Home</string>
+    <string name="messages">Messages</string>
+    <string name="profile">Profile</string>
+
+    <string name="calendar">Calendar</string>
+
+    <string name="add_task">Add Task</string>
+    <string name="task_title">Task Title</string>
+    <string name="enter_task_title">Enter task title</string>
+
+    <string name="description">Description</string>
+    <string name="enter_description">Enter description</string>
+
+    <string name="deadline">Deadline</string>
+    <string name="select_deadline">Select deadline</string>
+
+    <string name="assigned_to">Assigned To</string>
+    <string name="enter_assigned">Enter name</string>
+
+    <string name="points">Points</string>
+    <string name="enter_points">Enter points</string>
+
+    <string name="back">Back</string>
+    <string name="submit_task">Add Task</string>
+
+    <string name="task_calendar_title">Task Calendar</string>
+
+    <string name="project_kickoff_meeting">Project Kickoff Meeting</string>
+
+    <string name="coins_50">50</string>
 </resources>
