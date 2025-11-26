@@ -16,8 +16,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class ApiClient {
-
-    private static final String BASE_URL = "http://10.0.2.2:8000/";
+    
+   // For Android Emulator: use 10.0.2.2 to access host machine's localhost
+    // For Physical Device: use your computer's IP address (e.g., "http://192.168.1.100:8000/")
+    private static final String BASE_URL = "http://localhost:8000/";
     private static Retrofit retrofit = null;
 
     // ---------------------------

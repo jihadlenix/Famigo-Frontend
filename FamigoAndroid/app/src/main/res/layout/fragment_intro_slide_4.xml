@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <!-- Header with Famigo branding -->
+    <TextView
+        android:id="@+id/brandTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Famigo"
+        android:textSize="40sp"
+        android:textColor="@color/intro_text_secondary"
+        android:gravity="center"
+        android:paddingTop="16dp"
+        android:paddingBottom="8dp"
+        android:paddingStart="64dp"
+        android:paddingEnd="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Guideline for image alignment -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/imageGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.45"/>
+
+    <!-- Reward title -->
+    <TextView
+        android:id="@+id/rewardTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/intro_title_4"
+        android:textSize="28sp"
+        android:fontFamily="sans-serif-light"
+        android:textColor="@color/intro_text_primary"
+        android:gravity="center"
+        android:paddingTop="20dp"
+        android:paddingBottom="12dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        app:layout_constraintTop_toBottomOf="@id/brandTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Description -->
+    <TextView
+        android:id="@+id/rewardDescription"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/intro_description_4"
+        android:textSize="16sp"
+        android:lineSpacingExtra="8dp"
+        android:textColor="@color/intro_text_primary"
+        android:gravity="center"
+        android:paddingTop="4dp"
+        android:paddingBottom="12dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        app:layout_constraintTop_toBottomOf="@id/rewardTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Gift box image container -->
+    <ImageView
+        android:id="@+id/giftBoxImage"
+        android:layout_width="0dp"
+        android:layout_height="280dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/intro_slide4_reward"
+        android:contentDescription="@string/intro_title_4"
+        app:layout_constraintTop_toTopOf="@id/imageGuideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Page indicators -->
+    <LinearLayout
+        android:id="@+id/pageIndicators"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        app:layout_constraintTop_toBottomOf="@id/giftBoxImage"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <View
+            android:id="@+id/dot1"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/bg_page_indicator_inactive"/>
+
+        <View
+            android:id="@+id/dot2"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/bg_page_indicator_inactive"/>
+
+        <View
+            android:id="@+id/dot3"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/bg_page_indicator_inactive"/>
+
+        <View
+            android:id="@+id/dot4"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:background="@drawable/bg_page_indicator_active"/>
+    </LinearLayout>
+
+    <!-- Get Started button at bottom -->
+    <Button
+        android:id="@+id/getStartedButton"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:text="@string/intro_get_started"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/intro_text_primary"
+        android:textAllCaps="false"
+        android:background="@drawable/bg_intro_button"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <!-- Header with Famigo branding -->
+    <TextView
+        android:id="@+id/brandTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Famigo"
+        android:textSize="40sp"
+        android:textColor="@color/intro_text_primary"
+        android:gravity="center"
+        android:paddingTop="16dp"
+        android:paddingBottom="8dp"
+        android:paddingStart="64dp"
+        android:paddingEnd="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Guideline for image alignment -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/imageGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.45"/>
+
+    <!-- Title -->
+    <TextView
+        android:id="@+id/assignTasksTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/intro_title_2"
+        android:textSize="24sp"
+        android:textColor="@color/intro_text_primary"
+        android:gravity="center"
+        android:paddingTop="20dp"
+        android:paddingBottom="8dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        app:layout_constraintTop_toBottomOf="@id/brandTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Description -->
+    <TextView
+        android:id="@+id/assignTasksDescription"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/intro_description_2"
+        android:textSize="16sp"
+        android:textColor="@color/intro_text_primary"
+        android:gravity="center"
+        android:paddingTop="4dp"
+        android:paddingBottom="12dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        app:layout_constraintTop_toBottomOf="@id/assignTasksTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Image -->
+    <ImageView
+        android:id="@+id/assignTasksImage"
+        android:layout_width="0dp"
+        android:layout_height="280dp"
+        android:scaleType="centerCrop"
+        android:contentDescription="@string/intro_title_2"
+        app:layout_constraintTop_toTopOf="@id/imageGuideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Task List Container -->
+    <LinearLayout
+        android:id="@+id/taskListContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        app:layout_constraintTop_toBottomOf="@id/assignTasksImage"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Task 1: Clean your room -->
+        <LinearLayout
+            android:id="@+id/task1Container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp">
+
+            <TextView
+                android:id="@+id/task1Text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/task_clean_room"
+                android:textSize="16sp"
+                android:textColor="@color/intro_text_primary"/>
+
+            <ImageView
+                android:id="@+id/task1Checkbox"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_checkbox_checked"
+                android:contentDescription="@string/task_clean_room"/>
+        </LinearLayout>
+
+        <!-- Task 2: Do your homework -->
+        <LinearLayout
+            android:id="@+id/task2Container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp">
+
+            <TextView
+                android:id="@+id/task2Text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/task_homework"
+                android:textSize="16sp"
+                android:textColor="@color/intro_text_primary"/>
+
+            <View
+                android:id="@+id/task2Checkbox"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:background="@drawable/bg_checkbox_unchecked"/>
+        </LinearLayout>
+
+        <!-- Task 3: Help with dinner -->
+        <LinearLayout
+            android:id="@+id/task3Container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp">
+
+            <TextView
+                android:id="@+id/task3Text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/task_help_dinner"
+                android:textSize="16sp"
+                android:textColor="@color/intro_text_primary"/>
+
+            <View
+                android:id="@+id/task3Checkbox"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:background="@drawable/bg_checkbox_unchecked"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Page indicators -->
+    <LinearLayout
+        android:id="@+id/pageIndicators"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        app:layout_constraintTop_toBottomOf="@id/taskListContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <View
+            android:id="@+id/dot1"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/bg_page_indicator_inactive"/>
+
+        <View
+            android:id="@+id/dot2"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/bg_page_indicator_active"/>
+
+        <View
+            android:id="@+id/dot3"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/bg_page_indicator_inactive"/>
+
+        <View
+            android:id="@+id/dot4"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:background="@drawable/bg_page_indicator_inactive"/>
+    </LinearLayout>
+
+    <!-- Next button at bottom -->
+    <Button
+        android:id="@+id/nextButton"
+        android:layout_width="84dp"
+        android:layout_height="48dp"
+        android:text="@string/intro_next"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/intro_text_primary"
+        android:textAllCaps="false"
+        android:background="@drawable/bg_intro_button"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

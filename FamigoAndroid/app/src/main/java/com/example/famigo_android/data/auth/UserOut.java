@@ -5,4 +5,5 @@ public class UserOut {
     public String email;
     public String username;
     public String full_name;
+    public int age;  // Age in years (required)
 }

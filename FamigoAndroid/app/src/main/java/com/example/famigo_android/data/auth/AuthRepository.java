@@ -16,9 +16,8 @@ public class AuthRepository {
         store = new TokenStore(ctx);
     }
 
-    // 🔥 UPDATED — now includes username between fullName and email
-    public Call<UserOut> signup(String fullName, String username, String email, String password) {   // ✅ added username parameter
-        SignupRequest req = new SignupRequest(email, password, username, fullName);   // ✅ username supplied instead of null
+    public Call<UserOut> signup(String fullName, String email, String password, int age) {
+        SignupRequest req = new SignupRequest(email, password, null, fullName, age);
         return api.signup(req);
     }
 

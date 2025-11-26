@@ -28,13 +28,21 @@
         <activity android:name=".ui.tasks.TasksDashboardActivity" />
 
         <activity
-            android:name=".ui.auth.WelcomeActivity"
+            android:name=".ui.intro.IntroActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.auth.SignupActivity" />
+        <activity android:name=".ui.auth.MainActivity" />
+        <activity android:name=".ui.auth.WelcomeActivity" />
+
+        <activity android:name=".ui.family.HomeActivity" />
+        <activity android:name=".ui.family.RegisterFamilyActivity" />
+        <activity android:name=".ui.family.JoinFamilyActivity" />
+        <activity android:name=".ui.store.StoreActivity" />
 
 
     </application>

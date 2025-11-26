@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_marginEnd="8dp"
+        android:maxWidth="228dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="300 XP"
+            android:textSize="14sp"
+            android:textColor="@color/store_text_muted"
+            android:fontFamily="sans-serif"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Board Game Night"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/store_text_dark"
+            android:minHeight="20dp"
+            android:layout_marginTop="4dp"
+            android:fontFamily="sans-serif-medium"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Spend an evening playing board games and enjoying quality time together."
+            android:textSize="14sp"
+            android:textColor="@color/store_text_muted"
+            android:lineSpacingExtra="7dp"
+            android:layout_marginTop="4dp"
+            android:fontFamily="sans-serif"/>
+
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="130dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:src="@drawable/reward_board_game"
+        android:scaleType="centerCrop"
+        android:background="@drawable/bg_reward_image"
+        android:contentDescription="Board Game Night"/>
+
+</LinearLayout>
