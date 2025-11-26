@@ -17,6 +17,7 @@ import com.example.famigo_android.data.auth.TokenStore;
 import com.example.famigo_android.data.rewards.RewardOut;
 import com.example.famigo_android.data.rewards.RewardRepository;
 import com.example.famigo_android.data.rewards.SimpleRedeemResponse;
+import com.example.famigo_android.ui.auth.ProfileActivity;
 import com.example.famigo_android.ui.tasks.TasksDashboardActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -31,41 +32,18 @@ public class StoreActivity extends AppCompatActivity {
 
     private RewardRepository repo;
     private RewardAdapter adapter;
-    private String familyId; // you should pass this via Intent extras
+    private String familyId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_store);
 
-
-        ImageButton navHome = findViewById(R.id.nav_home);
-        ImageButton navMessages = findViewById(R.id.nav_messages);
-        ImageButton navProfile = findViewById(R.id.nav_profile);
-
-// highlight the active icon
-        navMessages.setColorFilter(getColor(R.color.text_primary));
-        navHome.setColorFilter(getColor(R.color.text_secondary));
-        navProfile.setColorFilter(getColor(R.color.text_secondary));
-
-        navHome.setOnClickListener(v -> {
-            Intent i = new Intent(StoreActivity.this, TasksDashboardActivity.class);
-            i.putExtra("FAMILY_ID", familyId);  // 🔥 ADD THIS LINE
-            startActivity(i);
-        });
-
-        navMessages.setOnClickListener(v -> {
-            // We are already in store, do nothing
-        });
-
-
-
         repo = new RewardRepository(this);
 
-        // TODO: get this from the place where family was created/joined
+        // Resolve familyId (from Intent or TokenStore)
         familyId = getIntent().getStringExtra("FAMILY_ID");
         if (familyId == null) {
-            // fallback to stored family ID
             TokenStore store = new TokenStore(this);
             familyId = store.getFamilyId();
         }
@@ -76,18 +54,47 @@ public class StoreActivity extends AppCompatActivity {
             return;
         }
 
-// ALWAYS SAVE IT
+        // Always persist the latest familyId
         new TokenStore(this).saveFamilyId(familyId);
 
+        // Bottom navigation wiring
+        ImageButton navHome = findViewById(R.id.nav_home);
+        ImageButton navMessages = findViewById(R.id.nav_messages);
+        ImageButton navProfile = findViewById(R.id.nav_profile);
+
+        // In this screen, "messages" icon (middle) is active (Rewards Store)
+        navMessages.setColorFilter(getColor(R.color.text_primary));
+        navHome.setColorFilter(getColor(R.color.text_secondary));
+        navProfile.setColorFilter(getColor(R.color.text_secondary));
+
+        // Home → Tasks dashboard (pass familyId)
+        navHome.setOnClickListener(v -> {
+            Intent i = new Intent(StoreActivity.this, TasksDashboardActivity.class);
+            i.putExtra("FAMILY_ID", familyId);
+            startActivity(i);
+        });
+
+        // Messages (current screen) → do nothing
+        navMessages.setOnClickListener(v -> {
+            // Already in Rewards Store
+        });
+
+        // Profile → open ProfileActivity
+        navProfile.setOnClickListener(v -> {
+            Intent i = new Intent(StoreActivity.this, ProfileActivity.class);
+            startActivity(i);
+        });
+
+        // RecyclerView + FAB
         RecyclerView recycler = findViewById(R.id.rewardsRecyclerView);
         recycler.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new RewardAdapter(new ArrayList<>(), reward -> redeemReward(reward));
+        adapter = new RewardAdapter(new ArrayList<>(), this::redeemReward);
         recycler.setAdapter(adapter);
 
         FloatingActionButton addBtn = findViewById(R.id.addRewardFab);
-
         addBtn.setOnClickListener(v -> showAddRewardDialog());
 
+        // Load rewards
         loadRewards();
     }
 
@@ -98,12 +105,23 @@ public class StoreActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     adapter.setRewards(response.body());
                 } else {
+                    String msg = "Failed to load rewards";
+                    try {
+                        if (response.errorBody() != null) {
+                            msg += " (" + response.code() + "): " + response.errorBody().string();
+                        } else {
+                            msg += " (" + response.code() + ")";
+                        }
+                    } catch (Exception ignored) {}
+
+                    android.util.Log.e("StoreActivity", msg);
                     Toast.makeText(StoreActivity.this, "Failed to load rewards", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<List<RewardOut>> call, Throwable t) {
+                android.util.Log.e("StoreActivity", "Error loading rewards", t);
                 Toast.makeText(StoreActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -187,6 +205,4 @@ public class StoreActivity extends AppCompatActivity {
         builder.setNegativeButton("Cancel", (d, w) -> d.dismiss());
         builder.show();
     }
-
 }
-

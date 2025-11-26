@@ -4,7 +4,7 @@ import com.example.famigo_android.data.auth.AuthApi;
 import com.example.famigo_android.data.family.FamilyApi;
 import com.example.famigo_android.data.rewards.RewardApi;
 import com.example.famigo_android.data.tasks.TaskApi;
-import com.example.famigo_android.data.tasks.TaskApi;
+import com.example.famigo_android.data.user.UserApi;   // 👈 NEW
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -26,12 +26,10 @@ public class ApiClient {
     private static Retrofit getRetrofit() {
         if (retrofit == null) {
 
-            // Custom date parsing for deadlines
             Gson gson = new GsonBuilder()
                     .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
                     .create();
 
-            // Logging interceptor
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
             logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -65,8 +63,12 @@ public class ApiClient {
         return getRetrofit().create(RewardApi.class);
     }
 
-    // ⭐ NEW → Tasks API
     public static TaskApi getTasksApi() {
         return getRetrofit().create(TaskApi.class);
+    }
+
+    // ⭐ NEW → Users API
+    public static UserApi getUserApi() {
+        return getRetrofit().create(UserApi.class);
     }
 }

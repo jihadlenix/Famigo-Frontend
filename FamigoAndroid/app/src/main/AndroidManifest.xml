@@ -18,7 +18,7 @@
 
         <activity android:name=".ui.auth.SignupActivity" />
         <activity android:name=".ui.auth.MainActivity" />
-
+        <activity android:name=".ui.auth.ProfileActivity" />
         <activity android:name=".ui.family.HomeActivity" />
         <activity android:name=".ui.family.RegisterFamilyActivity" />
         <activity android:name=".ui.family.JoinFamilyActivity" />

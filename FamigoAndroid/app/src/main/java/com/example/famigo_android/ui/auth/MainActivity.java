@@ -15,7 +15,7 @@ import com.example.famigo_android.data.auth.TokenOut;
 import com.example.famigo_android.data.auth.TokenStore;
 import com.example.famigo_android.data.family.FamilyOut;
 import com.example.famigo_android.data.family.FamilyRepository;
-import com.example.famigo_android.ui.family.RegisterFamilyActivity;
+import com.example.famigo_android.ui.family.HomeActivity;          // 👈 import
 import com.example.famigo_android.ui.rewards.StoreActivity;
 
 import java.util.List;
@@ -58,10 +58,8 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<TokenOut> call, Response<TokenOut> response) {
                     if (response.isSuccessful() && response.body() != null) {
-
                         repo.persistTokens(response.body());
-                        checkUserFamilies();  // 🔥 NEW LOGIC
-
+                        checkUserFamilies();   // 🔥 decide where to go next
                     } else {
                         Toast.makeText(MainActivity.this, "Incorrect credentials", Toast.LENGTH_LONG).show();
                     }
@@ -92,11 +90,14 @@ public class MainActivity extends AppCompatActivity {
                 List<FamilyOut> families = response.body();
                 TokenStore tokenStore = new TokenStore(MainActivity.this);
 
-                if (families.size() == 0) {
-                    Intent i = new Intent(MainActivity.this, RegisterFamilyActivity.class);
+                if (families.isEmpty()) {
+                    // 👇 CHANGE: if user has NO family, go to HomeActivity
+                    // where they can choose Register OR Join.
+                    Intent i = new Intent(MainActivity.this, HomeActivity.class);
                     startActivity(i);
                     finish();
                 } else {
+                    // user already has at least one family → keep current behaviour
                     tokenStore.saveFamilyId(families.get(0).id);
 
                     Intent i = new Intent(MainActivity.this, StoreActivity.class);
