@@ -1,12 +1,6 @@
 package com.example.famigo_android.data.tasks;
 
 import java.util.List;
-import com.example.famigo_android.data.tasks.Task;
-import com.example.famigo_android.data.tasks.TaskCreateRequest;
-import com.example.famigo_android.data.tasks.AssignTaskRequest;
-import com.example.famigo_android.data.tasks.PointsResponse;
-
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -38,7 +32,7 @@ public interface TaskApi {
             @Body TaskCreateRequest body
     );
 
-    // ➤ Assign task to user by username
+    // ➤ Assign task to a family member (by member_id)
     @POST("tasks/tasks/{task_id}/assign")
     Call<Void> assignTask(
             @Header("Authorization") String token,
@@ -46,7 +40,7 @@ public interface TaskApi {
             @Body AssignTaskRequest body
     );
 
-    // ➤ Mark task as complete
+    // ➤ Mark task as complete for the current user
     @POST("tasks/tasks/{task_id}/complete")
     Call<Void> completeTask(
             @Header("Authorization") String token,

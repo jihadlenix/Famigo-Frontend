@@ -157,16 +157,14 @@
                 android:textColor="@color/text_primary"
                 android:textStyle="bold" />
 
-            <EditText
-                android:id="@+id/input_assigned"
+            <Spinner
+                android:id="@+id/spinner_assigned"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:background="@color/input_bg"
                 android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:textColor="@color/text_primary"
-                android:hint="@string/enter_assigned"
-                android:textColorHint="@color/placeholder_green" />
+                android:paddingEnd="12dp" />
+
 
 
             <!-- Points -->

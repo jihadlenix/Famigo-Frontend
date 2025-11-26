@@ -11,13 +11,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.famigo_android.R;
-import com.example.famigo_android.data.auth.AuthRepository;
 import com.example.famigo_android.data.auth.TokenStore;
-import com.example.famigo_android.data.tasks.TaskAdapter;
 import com.example.famigo_android.data.network.ApiClient;
 import com.example.famigo_android.data.tasks.PointsResponse;
 import com.example.famigo_android.data.tasks.Task;
+import com.example.famigo_android.data.tasks.TaskAdapter;
 import com.example.famigo_android.data.tasks.TaskApi;
+import com.example.famigo_android.ui.auth.ProfileActivity;
 import com.example.famigo_android.ui.rewards.StoreActivity;
 
 import java.util.List;
@@ -36,8 +36,8 @@ public class TasksDashboardActivity extends AppCompatActivity {
 
     TokenStore tokenStore;
 
-    private String token;     // NOW dynamic
-    private String familyId;  // NOW dynamic
+    private String token;
+    private String familyId;
 
     private TaskApi taskApi;
 
@@ -53,10 +53,9 @@ public class TasksDashboardActivity extends AppCompatActivity {
         familyId = getIntent().getStringExtra("FAMILY_ID");
 
         if (familyId == null) {
-            // fallback to stored
             familyId = tokenStore.getFamilyId();
         }
-        tokenStore.saveFamilyId(familyId); // 🔥 store it globally
+        tokenStore.saveFamilyId(familyId);
 
         if (familyId == null) {
             Toast.makeText(this, "Family ID missing!", Toast.LENGTH_LONG).show();
@@ -64,8 +63,6 @@ public class TasksDashboardActivity extends AppCompatActivity {
             return;
         }
 
-
-        // bottom nav
         ImageButton navHome = findViewById(R.id.nav_home);
         ImageButton navMessages = findViewById(R.id.nav_messages);
         ImageButton navProfile = findViewById(R.id.nav_profile);
@@ -80,16 +77,25 @@ public class TasksDashboardActivity extends AppCompatActivity {
             startActivity(i);
         });
 
-        // Buttons
+        navProfile.setOnClickListener(v -> {
+            startActivity(new Intent(TasksDashboardActivity.this, ProfileActivity.class));
+        });
+
         ImageButton addTaskButton = findViewById(R.id.button_add_task);
         ImageButton calendarButton = findViewById(R.id.button_calendar);
         textCoinsValue = findViewById(R.id.text_coins_value);
 
-        addTaskButton.setOnClickListener(v ->
-                startActivity(new Intent(this, AddTaskActivity.class)));
+        addTaskButton.setOnClickListener(v -> {
+            Intent i = new Intent(this, AddTaskActivity.class);
+            i.putExtra("FAMILY_ID", familyId);
+            startActivity(i);
+        });
 
-        calendarButton.setOnClickListener(v ->
-                startActivity(new Intent(this, TaskCalendarActivity.class)));
+        calendarButton.setOnClickListener(v -> {
+            Intent i = new Intent(this, TaskCalendarActivity.class);
+            i.putExtra("FAMILY_ID", familyId);
+            startActivity(i);
+        });
 
         recyclerMyTasks = findViewById(R.id.recycler_my_tasks);
         recyclerFamilyTasks = findViewById(R.id.recycler_family_tasks);
@@ -110,47 +116,39 @@ public class TasksDashboardActivity extends AppCompatActivity {
 
     private void loadTasks() {
 
-        // MY TASKS
         taskApi.getMyTasks(token).enqueue(new Callback<List<Task>>() {
             @Override
             public void onResponse(Call<List<Task>> call, Response<List<Task>> response) {
                 if (response.isSuccessful()) {
-
                     myTasksAdapter = new TaskAdapter(
                             response.body(),
                             "MY_TASKS",
                             token,
                             TasksDashboardActivity.this
                     );
-
                     recyclerMyTasks.setAdapter(myTasksAdapter);
                 }
             }
 
-            @Override
-            public void onFailure(Call<List<Task>> call, Throwable t) {}
+            @Override public void onFailure(Call<List<Task>> call, Throwable t) {}
         });
 
-        // FAMILY TASKS
         taskApi.getFamilyTasks(token, familyId)
                 .enqueue(new Callback<List<Task>>() {
                     @Override
                     public void onResponse(Call<List<Task>> call, Response<List<Task>> response) {
                         if (response.isSuccessful()) {
-
                             familyTasksAdapter = new TaskAdapter(
                                     response.body(),
                                     "FAMILY_TASKS",
                                     token,
                                     TasksDashboardActivity.this
                             );
-
                             recyclerFamilyTasks.setAdapter(familyTasksAdapter);
                         }
                     }
 
-                    @Override
-                    public void onFailure(Call<List<Task>> call, Throwable t) {}
+                    @Override public void onFailure(Call<List<Task>> call, Throwable t) {}
                 });
     }
 
@@ -164,8 +162,7 @@ public class TasksDashboardActivity extends AppCompatActivity {
                 }
             }
 
-            @Override
-            public void onFailure(Call<PointsResponse> call, Throwable t) {}
+            @Override public void onFailure(Call<PointsResponse> call, Throwable t) {}
         });
     }
 

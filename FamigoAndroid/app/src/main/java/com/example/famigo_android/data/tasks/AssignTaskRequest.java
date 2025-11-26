@@ -2,13 +2,14 @@ package com.example.famigo_android.data.tasks;
 
 public class AssignTaskRequest {
 
-    private String username;
+    // We assign by FamilyMember.id (member_id), not username
+    private String member_id;
 
-    public AssignTaskRequest(String username) {
-        this.username = username;
+    public AssignTaskRequest(String member_id) {
+        this.member_id = member_id;
     }
 
-    public String getUsername() {
-        return username;
+    public String getMember_id() {
+        return member_id;
     }
 }

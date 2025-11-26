@@ -15,6 +15,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.famigo_android.R;
+import com.example.famigo_android.data.auth.TokenStore;
 import com.example.famigo_android.data.network.ApiClient;
 import com.example.famigo_android.data.tasks.PointsResponse;
 import com.example.famigo_android.data.tasks.Task;
@@ -42,10 +43,8 @@ public class TaskCalendarActivity extends AppCompatActivity {
 
     private String selectedDate = ""; // yyyy-MM-dd
 
-    String token =
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4ZThmY2JhYi00YTQzLTRmZGItYTA0Zi02MWI4ODU5ODZiZjMiLCJleHAiOjE3NjQxNzM1NDh9._eVMON9kXE3xo0t3pdshXXDObXni-8t5qhhi0Rp06BA";
-
-    String familyId = "1fe7a2a4-bf5c-4221-b7ab-73feab72b519";
+    private String token;
+    private String familyId;
 
     private TaskApi taskApi;
 
@@ -56,48 +55,63 @@ public class TaskCalendarActivity extends AppCompatActivity {
 
         taskApi = ApiClient.getTasksApi();
 
+        // token + family
+        TokenStore ts = new TokenStore(this);
+        token = "Bearer " + ts.getAccessToken();
+        familyId = getIntent().getStringExtra("FAMILY_ID");
+        if (familyId == null) {
+            familyId = ts.getFamilyId();
+        }
+        if (familyId == null) {
+            Toast.makeText(this, "Family ID missing", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+
         textCoinsValue = findViewById(R.id.text_coins_value);
         containerMyTasks = findViewById(R.id.container_my_tasks);
         containerFamilyTasks = findViewById(R.id.container_family_tasks);
         calendarView = findViewById(R.id.calendarView);
 
-        // Default selected date = today
+        // default selected date = today
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
         selectedDate = sdf.format(new Date());
 
         loadCoins();
         loadTasks();
 
+        // + button -> AddTaskActivity with FAMILY_ID
         ImageButton buttonAdd = findViewById(R.id.button_add_task);
-        buttonAdd.setOnClickListener(v ->
-                startActivity(new Intent(TaskCalendarActivity.this, AddTaskActivity.class))
-        );
+        buttonAdd.setOnClickListener(v -> {
+            Intent i = new Intent(TaskCalendarActivity.this, AddTaskActivity.class);
+            i.putExtra("FAMILY_ID", familyId);
+            startActivity(i);
+        });
 
         ImageView calendarToggle = findViewById(R.id.icon_calendar_toggle);
         calendarToggle.setOnClickListener(v -> finish());
 
         calendarView.setOnDateChangeListener((view, year, month, day) -> {
-            selectedDate = String.format("%04d-%02d-%02d", year, month + 1, day);
+            selectedDate = String.format(Locale.US, "%04d-%02d-%02d", year, month + 1, day);
             filterTasks();
         });
 
         findViewById(R.id.nav_home).setOnClickListener(v -> {
-            startActivity(new Intent(TaskCalendarActivity.this, TasksDashboardActivity.class));
+            Intent i = new Intent(TaskCalendarActivity.this, TasksDashboardActivity.class);
+            i.putExtra("FAMILY_ID", familyId);
+            startActivity(i);
             finish();
         });
     }
 
-
-    // ---------------------------------------------------------
-    // LOAD COINS
-    // ---------------------------------------------------------
     private void loadCoins() {
         taskApi.getMyPoints(token)
                 .enqueue(new Callback<PointsResponse>() {
                     @Override
                     public void onResponse(Call<PointsResponse> call, Response<PointsResponse> response) {
-                        if (response.isSuccessful() && response.body() != null)
+                        if (response.isSuccessful() && response.body() != null) {
                             textCoinsValue.setText(String.valueOf(response.body().getTotalPoints()));
+                        }
                     }
 
                     @Override
@@ -105,72 +119,59 @@ public class TaskCalendarActivity extends AppCompatActivity {
                 });
     }
 
-
-    // ---------------------------------------------------------
-    // LOAD TASKS
-    // ---------------------------------------------------------
     private void loadTasks() {
-
-        // My tasks
+        // my tasks
         taskApi.getMyTasks(token).enqueue(new Callback<List<Task>>() {
             @Override
             public void onResponse(Call<List<Task>> call, Response<List<Task>> response) {
-                if (response.isSuccessful() && response.body() != null)
+                if (response.isSuccessful() && response.body() != null) {
                     allMyTasks = response.body();
-                filterTasks();
+                    filterTasks();
+                }
             }
 
             @Override public void onFailure(Call<List<Task>> call, Throwable t) {}
         });
 
-        // Family tasks
+        // family tasks
         taskApi.getFamilyTasks(token, familyId).enqueue(new Callback<List<Task>>() {
             @Override
             public void onResponse(Call<List<Task>> call, Response<List<Task>> response) {
-                if (response.isSuccessful() && response.body() != null)
+                if (response.isSuccessful() && response.body() != null) {
                     allFamilyTasks = response.body();
-                filterTasks();
+                    filterTasks();
+                }
             }
 
             @Override public void onFailure(Call<List<Task>> call, Throwable t) {}
         });
     }
 
-
-    // ---------------------------------------------------------
-    // FILTER TASKS BY SELECTED DATE
-    // ---------------------------------------------------------
     private void filterTasks() {
-
         containerMyTasks.removeAllViews();
         containerFamilyTasks.removeAllViews();
 
         SimpleDateFormat iso = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
         SimpleDateFormat justDate = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
-        // My tasks
         for (Task t : allMyTasks) {
             try {
-                if (justDate.format(iso.parse(t.getDeadline())).equals(selectedDate))
+                if (justDate.format(iso.parse(t.getDeadline())).equals(selectedDate)) {
                     addCard(containerMyTasks, t);
+                }
             } catch (Exception ignored) {}
         }
 
-        // Family tasks
         for (Task t : allFamilyTasks) {
             try {
-                if (justDate.format(iso.parse(t.getDeadline())).equals(selectedDate))
+                if (justDate.format(iso.parse(t.getDeadline())).equals(selectedDate)) {
                     addCard(containerFamilyTasks, t);
+                }
             } catch (Exception ignored) {}
         }
     }
 
-
-    // ---------------------------------------------------------
-    // ADD A SINGLE TASK CARD
-    // ---------------------------------------------------------
     private void addCard(LinearLayout parent, Task task) {
-
         View card = LayoutInflater.from(this)
                 .inflate(R.layout.item_task_calendar_card, parent, false);
 
@@ -185,17 +186,13 @@ public class TaskCalendarActivity extends AppCompatActivity {
         checkbox.setChecked(done);
         checkbox.setEnabled(!done);
 
-
-        // ✓ Complete task when checkbox clicked
         checkbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-
             if (!isChecked) return;
 
             taskApi.completeTask(token, task.getId())
                     .enqueue(new Callback<Void>() {
                         @Override
                         public void onResponse(Call<Void> call, Response<Void> response) {
-
                             if (!response.isSuccessful()) {
                                 Toast.makeText(TaskCalendarActivity.this,
                                         "Failed to complete task",
@@ -207,7 +204,6 @@ public class TaskCalendarActivity extends AppCompatActivity {
                             task.setStatus("DONE");
                             checkbox.setEnabled(false);
 
-                            // Add coins on UI
                             int current = Integer.parseInt(textCoinsValue.getText().toString());
                             int updated = current + task.getPoints_value();
                             textCoinsValue.setText(String.valueOf(updated));

@@ -23,6 +23,8 @@
         <activity android:name=".ui.family.RegisterFamilyActivity" />
         <activity android:name=".ui.family.JoinFamilyActivity" />
         <activity android:name=".ui.rewards.StoreActivity" />
+        <activity android:name=".ui.tasks.AddTaskActivity" />
+        <activity android:name=".ui.tasks.TaskCalendarActivity" />
         <activity android:name=".ui.tasks.TasksDashboardActivity" />
 
         <activity
