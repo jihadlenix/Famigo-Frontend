@@ -35,5 +35,12 @@ public interface RewardApi {
             @Path("reward_id") String rewardId
     );
 
+    // 4) Get redeemed items for a specific member (for parents to view children's redemptions)
+    @GET("/families/{family_id}/members/{member_id}/redemptions")
+    Call<List<RedemptionOut>> getMemberRedemptions(
+            @Header("Authorization") String bearer,
+            @Path("family_id") String familyId,
+            @Path("member_id") String memberId
+    );
 
 }

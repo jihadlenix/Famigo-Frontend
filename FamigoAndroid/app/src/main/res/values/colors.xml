@@ -26,4 +26,22 @@
     <color name="button_green">#A8DAB5</color> <!-- pale button green -->
     <color name="dark_green">#2D4A3A</color>
 
+    <!-- Intro Slider Colors -->
+    <color name="intro_text_primary">#1C120D</color>
+    <color name="intro_text_secondary">#666666</color>
+    <color name="intro_dot_active">#8FC9A6</color>
+    <color name="intro_dot_inactive">#E0E0E0</color>
+    <color name="intro_button_bg">#8FC9A6</color>
+
+    <!-- Store Colors -->
+    <color name="store_background">#FCFCF7</color>
+    <color name="store_text_dark">#1C120D</color>
+    <color name="store_text_muted">#9AA0A6</color>
+    <color name="store_nav_background">#FFFFFF</color>
+    <color name="store_nav_border">#E0E0E0</color>
+
+    <!-- Toast Colors -->
+    <color name="error_red">#EF4444</color>
+    <color name="warning_orange">#F59E0B</color>
+
 </resources>

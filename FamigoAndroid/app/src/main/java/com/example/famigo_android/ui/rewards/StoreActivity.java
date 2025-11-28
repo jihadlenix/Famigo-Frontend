@@ -2,8 +2,8 @@ package com.example.famigo_android.ui.rewards;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -14,11 +14,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.famigo_android.R;
 import com.example.famigo_android.data.auth.TokenStore;
+import com.example.famigo_android.data.family.FamilyMemberOut;
+import com.example.famigo_android.data.family.FamilyOut;
+import com.example.famigo_android.data.family.FamilyRepository;
 import com.example.famigo_android.data.rewards.RewardOut;
 import com.example.famigo_android.data.rewards.RewardRepository;
 import com.example.famigo_android.data.rewards.SimpleRedeemResponse;
-import com.example.famigo_android.ui.auth.ProfileActivity;
-import com.example.famigo_android.ui.tasks.TasksDashboardActivity;
+import com.example.famigo_android.data.user.MeOut;
+import com.example.famigo_android.data.user.UserRepository;
+import com.example.famigo_android.ui.NavigationHelper;
+import com.example.famigo_android.ui.utils.FamigoToast;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -31,15 +36,28 @@ import retrofit2.Response;
 public class StoreActivity extends AppCompatActivity {
 
     private RewardRepository repo;
+    private FamilyRepository familyRepo;
+    private UserRepository userRepo;
     private RewardAdapter adapter;
     private String familyId;
+    private String currentUserId;
+    private View emptyRewards;
+    private FloatingActionButton addBtn;
+    private boolean isCurrentUserParent = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_store);
 
+        // Set status bar color to green
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(getColor(R.color.famigo_green_dark));
+        }
+
         repo = new RewardRepository(this);
+        familyRepo = new FamilyRepository(this);
+        userRepo = new UserRepository(this);
 
         // Resolve familyId (from Intent or TokenStore)
         familyId = getIntent().getStringExtra("FAMILY_ID");
@@ -49,7 +67,7 @@ public class StoreActivity extends AppCompatActivity {
         }
 
         if (familyId == null) {
-            Toast.makeText(this, "Family ID missing!", Toast.LENGTH_LONG).show();
+            FamigoToast.error(this, "Family ID missing!");
             finish();
             return;
         }
@@ -57,54 +75,104 @@ public class StoreActivity extends AppCompatActivity {
         // Always persist the latest familyId
         new TokenStore(this).saveFamilyId(familyId);
 
-        // Bottom navigation wiring
-        ImageButton navHome = findViewById(R.id.nav_home);
-        ImageButton navMessages = findViewById(R.id.nav_messages);
-        ImageButton navProfile = findViewById(R.id.nav_profile);
-
-        // In this screen, "messages" icon (middle) is active (Rewards Store)
-        navMessages.setColorFilter(getColor(R.color.text_primary));
-        navHome.setColorFilter(getColor(R.color.text_secondary));
-        navProfile.setColorFilter(getColor(R.color.text_secondary));
-
-        // Home → Tasks dashboard (pass familyId)
-        navHome.setOnClickListener(v -> {
-            Intent i = new Intent(StoreActivity.this, TasksDashboardActivity.class);
-            i.putExtra("FAMILY_ID", familyId);
-            startActivity(i);
-        });
-
-        // Messages (current screen) → do nothing
-        navMessages.setOnClickListener(v -> {
-            // Already in Rewards Store
-        });
-
-        // Profile → open ProfileActivity
-        navProfile.setOnClickListener(v -> {
-            Intent i = new Intent(StoreActivity.this, ProfileActivity.class);
-            startActivity(i);
-        });
+        // Setup unified bottom navigation
+        NavigationHelper.setupBottomNavigation(this, NavigationHelper.Tab.STORE);
 
         // RecyclerView + FAB
         RecyclerView recycler = findViewById(R.id.rewardsRecyclerView);
+        emptyRewards = findViewById(R.id.emptyRewards);
         recycler.setLayoutManager(new LinearLayoutManager(this));
         adapter = new RewardAdapter(new ArrayList<>(), this::redeemReward);
         recycler.setAdapter(adapter);
 
-        FloatingActionButton addBtn = findViewById(R.id.addRewardFab);
+        addBtn = findViewById(R.id.addRewardFab);
         addBtn.setOnClickListener(v -> showAddRewardDialog());
 
-        // Load rewards
+        // Load current user first, then check role and load rewards
+        loadCurrentUser();
+    }
+
+    private void loadCurrentUser() {
+        userRepo.getMe().enqueue(new Callback<MeOut>() {
+            @Override
+            public void onResponse(Call<MeOut> call, Response<MeOut> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    currentUserId = response.body().id;
+                    checkUserRole();
+                } else {
+                    // Still load rewards, just won't be able to check parent status
+                    loadRewards();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MeOut> call, Throwable t) {
+                // Still load rewards, just won't be able to check parent status
+                loadRewards();
+            }
+        });
+    }
+
+    private void checkUserRole() {
+        familyRepo.getFamilyById(familyId).enqueue(new Callback<FamilyOut>() {
+            @Override
+            public void onResponse(Call<FamilyOut> call, Response<FamilyOut> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    FamilyOut family = response.body();
+                    // Check if current user is a parent in this family
+                    if (family.members != null && currentUserId != null) {
+                        for (FamilyMemberOut member : family.members) {
+                            if (currentUserId.equals(member.user_id) && "PARENT".equalsIgnoreCase(member.role)) {
+                                isCurrentUserParent = true;
+                                break;
+                            }
+                        }
+                    }
+                    // Show/hide FAB based on role
+                    if (addBtn != null) {
+                        addBtn.setVisibility(isCurrentUserParent ? View.VISIBLE : View.GONE);
+                    }
+                }
+                // Load rewards regardless
+                loadRewards();
+            }
+
+            @Override
+            public void onFailure(Call<FamilyOut> call, Throwable t) {
+                // Load rewards even if role check fails
         loadRewards();
+            }
+        });
     }
 
     private void loadRewards() {
         repo.getRewards(familyId).enqueue(new Callback<List<RewardOut>>() {
             @Override
             public void onResponse(Call<List<RewardOut>> call, Response<List<RewardOut>> response) {
+                if (isFinishing() || isDestroyed()) {
+                    return;
+                }
+                
+                RecyclerView recycler = findViewById(R.id.rewardsRecyclerView);
+                if (recycler == null || emptyRewards == null) {
+                    return;
+                }
+                
                 if (response.isSuccessful() && response.body() != null) {
-                    adapter.setRewards(response.body());
+                    List<RewardOut> rewards = response.body();
+                    if (rewards.isEmpty()) {
+                        emptyRewards.setVisibility(View.VISIBLE);
+                        recycler.setVisibility(View.GONE);
+                    } else {
+                        emptyRewards.setVisibility(View.GONE);
+                        recycler.setVisibility(View.VISIBLE);
+                        adapter.setRewards(rewards);
+                    }
                 } else {
+                    // Show empty state on error
+                    emptyRewards.setVisibility(View.VISIBLE);
+                    recycler.setVisibility(View.GONE);
+                    
                     String msg = "Failed to load rewards";
                     try {
                         if (response.errorBody() != null) {
@@ -115,14 +183,24 @@ public class StoreActivity extends AppCompatActivity {
                     } catch (Exception ignored) {}
 
                     android.util.Log.e("StoreActivity", msg);
-                    Toast.makeText(StoreActivity.this, "Failed to load rewards", Toast.LENGTH_SHORT).show();
+                    FamigoToast.error(StoreActivity.this, "Failed to load rewards");
                 }
             }
 
             @Override
             public void onFailure(Call<List<RewardOut>> call, Throwable t) {
+                if (isFinishing() || isDestroyed()) {
+                    return;
+                }
+                
+                RecyclerView recycler = findViewById(R.id.rewardsRecyclerView);
+                if (recycler != null && emptyRewards != null) {
+                    emptyRewards.setVisibility(View.VISIBLE);
+                    recycler.setVisibility(View.GONE);
+                }
+                
                 android.util.Log.e("StoreActivity", "Error loading rewards", t);
-                Toast.makeText(StoreActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                FamigoToast.error(StoreActivity.this, t.getMessage() != null ? t.getMessage() : "Failed to load rewards");
             }
         });
     }
@@ -132,16 +210,22 @@ public class StoreActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<SimpleRedeemResponse> call, Response<SimpleRedeemResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().success) {
-                    Toast.makeText(StoreActivity.this, "Redeemed!", Toast.LENGTH_SHORT).show();
+                    FamigoToast.success(StoreActivity.this, "Redeemed!");
                     loadRewards();
                 } else {
-                    Toast.makeText(StoreActivity.this, "Not enough points", Toast.LENGTH_SHORT).show();
+                    String errorMsg = "Failed to redeem";
+                    if (response.code() == 403) {
+                        errorMsg = "Parents cannot redeem rewards";
+                    } else if (response.code() == 400) {
+                        errorMsg = "Not enough points";
+                    }
+                    FamigoToast.error(StoreActivity.this, errorMsg);
                 }
             }
 
             @Override
             public void onFailure(Call<SimpleRedeemResponse> call, Throwable t) {
-                Toast.makeText(StoreActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                FamigoToast.error(StoreActivity.this, t.getMessage() != null ? t.getMessage() : "Redeem failed");
             }
         });
     }
@@ -177,7 +261,7 @@ public class StoreActivity extends AppCompatActivity {
             String costStr = costInput.getText().toString().trim();
 
             if (title.isEmpty() || costStr.isEmpty()) {
-                Toast.makeText(this, "Fill title + cost", Toast.LENGTH_SHORT).show();
+                FamigoToast.warning(this, "Fill title + cost");
                 return;
             }
 
@@ -188,16 +272,16 @@ public class StoreActivity extends AppCompatActivity {
                         @Override
                         public void onResponse(Call<RewardOut> call, Response<RewardOut> response) {
                             if (response.isSuccessful()) {
-                                Toast.makeText(StoreActivity.this, "Reward added!", Toast.LENGTH_SHORT).show();
+                                FamigoToast.success(StoreActivity.this, "Reward added!");
                                 loadRewards();
                             } else {
-                                Toast.makeText(StoreActivity.this, "Failed to add reward", Toast.LENGTH_SHORT).show();
+                                FamigoToast.error(StoreActivity.this, "Failed to add reward");
                             }
                         }
 
                         @Override
                         public void onFailure(Call<RewardOut> call, Throwable t) {
-                            Toast.makeText(StoreActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                            FamigoToast.error(StoreActivity.this, t.getMessage() != null ? t.getMessage() : "Failed to add reward");
                         }
                     });
         });

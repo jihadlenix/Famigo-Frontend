@@ -7,4 +7,5 @@ public class RewardOut {
     public String description;
     public int cost_points;
     public boolean is_active;
+    public boolean is_redeemed;  // Whether current user has redeemed this reward
 }

@@ -52,4 +52,11 @@ public interface TaskApi {
     Call<PointsResponse> getMyPoints(
             @Header("Authorization") String token
     );
+
+    // ➤ Get assignment suggestions for a task
+    @GET("tasks/{task_id}/suggestions")
+    Call<TaskSuggestionsResponse> getTaskSuggestions(
+            @Header("Authorization") String token,
+            @Path("task_id") String taskId
+    );
 }

@@ -73,4 +73,8 @@ public class ApiClient {
     public static UserApi getUserApi() {
         return getRetrofit().create(UserApi.class);
     }
+
+    public static String getBaseUrl() {
+        return BASE_URL;
+    }
 }

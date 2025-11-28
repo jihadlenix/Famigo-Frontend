@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.famigo_android.R;
 import com.example.famigo_android.ui.tasks.TasksDashboardActivity;
+import com.example.famigo_android.ui.utils.FamigoToast;
 import com.example.famigo_android.data.network.ApiClient;
 import com.example.famigo_android.data.tasks.TaskApi;
 
@@ -65,6 +66,15 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         holder.deadline.setText(formatted);
         holder.points.setText(task.getPoints_value() + " pts");
 
+        // Display category
+        String category = task.getCategory();
+        if (category != null && !category.isEmpty()) {
+            holder.category.setText(category.toUpperCase());
+            holder.category.setVisibility(View.VISIBLE);
+        } else {
+            holder.category.setVisibility(View.GONE);
+        }
+
         if ("MY_TASKS".equals(mode)) {
             holder.assignedLabel.setText("Assigned: You");
         } else {
@@ -91,8 +101,13 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                         public void onResponse(Call<Void> call, Response<Void> response) {
 
                             if (!response.isSuccessful()) {
-                                Toast.makeText(holder.itemView.getContext(),
-                                        "Failed to complete task", Toast.LENGTH_SHORT).show();
+                                String errorMsg = "Failed to complete task";
+                                if (response.code() == 404) {
+                                    errorMsg = "This task is not assigned to you";
+                                } else if (response.code() == 403) {
+                                    errorMsg = "You cannot complete this task";
+                                }
+                                FamigoToast.error(holder.itemView.getContext(), errorMsg);
                                 holder.checkbox.setChecked(false);
                                 return;
                             }
@@ -103,15 +118,13 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                             // ADD COINS IN UI
                             dashboardActivity.addCoins(task.getPoints_value());
 
-                            Toast.makeText(holder.itemView.getContext(),
-                                    "Task completed!", Toast.LENGTH_SHORT).show();
+                            FamigoToast.success(holder.itemView.getContext(), "Task completed!");
                         }
 
                         @Override
                         public void onFailure(Call<Void> call, Throwable t) {
-                            Toast.makeText(holder.itemView.getContext(),
-                                    "Error: " + t.getMessage(),
-                                    Toast.LENGTH_SHORT).show();
+                            FamigoToast.error(holder.itemView.getContext(),
+                                    "Error: " + (t.getMessage() != null ? t.getMessage() : "Unknown error"));
                             holder.checkbox.setChecked(false);
                         }
                     });
@@ -126,7 +139,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     static class TaskViewHolder extends RecyclerView.ViewHolder {
 
         CheckBox checkbox;
-        TextView title, deadline, points, assignedLabel;
+        TextView title, deadline, points, assignedLabel, category;
 
         public TaskViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -136,6 +149,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             deadline = itemView.findViewById(R.id.text_task_deadline);
             points = itemView.findViewById(R.id.text_task_points);
             assignedLabel = itemView.findViewById(R.id.text_task_assigned);
+            category = itemView.findViewById(R.id.text_task_category);
         }
     }
 }

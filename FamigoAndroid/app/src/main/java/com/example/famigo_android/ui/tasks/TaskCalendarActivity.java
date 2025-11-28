@@ -20,6 +20,7 @@ import com.example.famigo_android.data.network.ApiClient;
 import com.example.famigo_android.data.tasks.PointsResponse;
 import com.example.famigo_android.data.tasks.Task;
 import com.example.famigo_android.data.tasks.TaskApi;
+import com.example.famigo_android.ui.utils.FamigoToast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -53,6 +54,11 @@ public class TaskCalendarActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_calendar);
 
+        // Set status bar color to green
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(getColor(R.color.famigo_green_dark));
+        }
+
         taskApi = ApiClient.getTasksApi();
 
         // token + family
@@ -63,7 +69,7 @@ public class TaskCalendarActivity extends AppCompatActivity {
             familyId = ts.getFamilyId();
         }
         if (familyId == null) {
-            Toast.makeText(this, "Family ID missing", Toast.LENGTH_LONG).show();
+            FamigoToast.error(this, "Family ID missing");
             finish();
             return;
         }
@@ -194,9 +200,13 @@ public class TaskCalendarActivity extends AppCompatActivity {
                         @Override
                         public void onResponse(Call<Void> call, Response<Void> response) {
                             if (!response.isSuccessful()) {
-                                Toast.makeText(TaskCalendarActivity.this,
-                                        "Failed to complete task",
-                                        Toast.LENGTH_SHORT).show();
+                                String errorMsg = "Failed to complete task";
+                                if (response.code() == 404) {
+                                    errorMsg = "This task is not assigned to you";
+                                } else if (response.code() == 403) {
+                                    errorMsg = "You cannot complete this task";
+                                }
+                                FamigoToast.error(TaskCalendarActivity.this, errorMsg);
                                 checkbox.setChecked(false);
                                 return;
                             }
@@ -208,16 +218,14 @@ public class TaskCalendarActivity extends AppCompatActivity {
                             int updated = current + task.getPoints_value();
                             textCoinsValue.setText(String.valueOf(updated));
 
-                            Toast.makeText(TaskCalendarActivity.this,
-                                    "Task completed! +" + task.getPoints_value() + " pts",
-                                    Toast.LENGTH_SHORT).show();
+                            FamigoToast.success(TaskCalendarActivity.this,
+                                    "Task completed! +" + task.getPoints_value() + " pts");
                         }
 
                         @Override
                         public void onFailure(Call<Void> call, Throwable t) {
-                            Toast.makeText(TaskCalendarActivity.this,
-                                    "Error: " + t.getMessage(),
-                                    Toast.LENGTH_SHORT).show();
+                            FamigoToast.error(TaskCalendarActivity.this,
+                                    "Error: " + (t.getMessage() != null ? t.getMessage() : "Unknown error"));
                             checkbox.setChecked(false);
                         }
                     });

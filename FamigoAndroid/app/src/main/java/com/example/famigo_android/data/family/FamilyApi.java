@@ -29,4 +29,10 @@ public interface FamilyApi {
             @Header("Authorization") String bearer
     );
 
+    @GET("/families/{family_id}")
+    Call<FamilyOut> getFamilyById(
+            @Header("Authorization") String bearer,
+            @Path("family_id") String familyId
+    );
+
 }

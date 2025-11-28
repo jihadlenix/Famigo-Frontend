@@ -12,6 +12,7 @@ import com.example.famigo_android.R;
 import com.example.famigo_android.data.family.FamilyOut;
 import com.example.famigo_android.data.family.FamilyRepository;
 import com.example.famigo_android.ui.rewards.StoreActivity;
+import com.example.famigo_android.ui.utils.FamigoToast;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -28,6 +29,11 @@ public class RegisterFamilyActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_family);
 
+        // Set status bar color to green
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(getColor(R.color.famigo_green_dark));
+        }
+
         repo = new FamilyRepository(this);
 
         familyNameEt = findViewById(R.id.familyNameEt);
@@ -36,7 +42,7 @@ public class RegisterFamilyActivity extends AppCompatActivity {
         registerBtn.setOnClickListener(v -> {
             String name = familyNameEt.getText().toString().trim();
             if (name.isEmpty()) {
-                Toast.makeText(this, "Enter family name", Toast.LENGTH_SHORT).show();
+                FamigoToast.warning(this, "Enter family name");
                 return;
             }
 
@@ -47,9 +53,8 @@ public class RegisterFamilyActivity extends AppCompatActivity {
 
                         FamilyOut fam = response.body();
 
-                        Toast.makeText(RegisterFamilyActivity.this,
-                                "Family created. Secret code: " + fam.secret_code,
-                                Toast.LENGTH_LONG).show();
+                        FamigoToast.success(RegisterFamilyActivity.this,
+                                "Family created. Secret code: " + fam.secret_code);
 
                         // ⭐ DIRECTLY OPEN STORE PAGE
                         Intent i = new Intent(RegisterFamilyActivity.this, StoreActivity.class);
@@ -58,14 +63,13 @@ public class RegisterFamilyActivity extends AppCompatActivity {
 
                         finish();
                     } else {
-                        Toast.makeText(RegisterFamilyActivity.this,
-                                "Failed to create family", Toast.LENGTH_LONG).show();
+                        FamigoToast.error(RegisterFamilyActivity.this, "Failed to create family");
                     }
                 }
 
                 @Override
                 public void onFailure(Call<FamilyOut> call, Throwable t) {
-                    Toast.makeText(RegisterFamilyActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
+                    FamigoToast.error(RegisterFamilyActivity.this, t.getMessage() != null ? t.getMessage() : "Failed to create family");
                 }
             });
         });

@@ -1,0 +1,49 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    
+    <!-- Cartoonish Family Icon - Simple and clean -->
+    <!-- Parent 1 (left) - head (rounded rectangle) -->
+    <path
+        android:fillColor="@color/famigo_green"
+        android:pathData="M18,13 L42,13 Q48,13 48,19 L48,31 Q48,37 42,37 L18,37 Q12,37 12,31 L12,19 Q12,13 18,13 Z"/>
+    <!-- Parent 1 - body -->
+    <path
+        android:fillColor="@color/famigo_green"
+        android:pathData="M18,37 L42,37 L42,65 L18,65 Z"/>
+    
+    <!-- Parent 2 (right) - head (rounded rectangle) -->
+    <path
+        android:fillColor="@color/famigo_green"
+        android:pathData="M78,13 L102,13 Q108,13 108,19 L108,31 Q108,37 102,37 L78,37 Q72,37 72,31 L72,19 Q72,13 78,13 Z"/>
+    <!-- Parent 2 - body -->
+    <path
+        android:fillColor="@color/famigo_green"
+        android:pathData="M78,37 L102,37 L102,65 L78,65 Z"/>
+    
+    <!-- Child 1 (left) - head (rounded rectangle) -->
+    <path
+        android:fillColor="@color/famigo_green_dark"
+        android:pathData="M17,62 L33,62 Q37,62 37,66 L37,74 Q37,78 33,78 L17,78 Q13,78 13,74 L13,66 Q13,62 17,62 Z"/>
+    <!-- Child 1 - body -->
+    <path
+        android:fillColor="@color/famigo_green_dark"
+        android:pathData="M17,78 L33,78 L33,95 L17,95 Z"/>
+    
+    <!-- Child 2 (right) - head (rounded rectangle) -->
+    <path
+        android:fillColor="@color/famigo_green_dark"
+        android:pathData="M87,62 L103,62 Q107,62 107,66 L107,74 Q107,78 103,78 L87,78 Q83,78 83,74 L83,66 Q83,62 87,62 Z"/>
+    <!-- Child 2 - body -->
+    <path
+        android:fillColor="@color/famigo_green_dark"
+        android:pathData="M87,78 L103,78 L103,95 L87,95 Z"/>
+    
+    <!-- Heart between parents (simple diamond shape) -->
+    <path
+        android:fillColor="#FFB6C1"
+        android:pathData="M60,30 L65,35 L60,40 L55,35 Z"/>
+</vector>
+

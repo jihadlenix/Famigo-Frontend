@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -17,6 +16,7 @@ import com.example.famigo_android.data.family.FamilyOut;
 import com.example.famigo_android.data.family.FamilyRepository;
 import com.example.famigo_android.ui.family.HomeActivity;          // 👈 import
 import com.example.famigo_android.ui.rewards.StoreActivity;
+import com.example.famigo_android.ui.utils.FamigoToast;
 
 import java.util.List;
 
@@ -37,6 +37,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Set status bar color to green
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(getColor(R.color.famigo_green_dark));
+        }
+
         repo = new AuthRepository(this);
         familyRepo = new FamilyRepository(this);
 
@@ -50,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
             String pass = passwordEt.getText().toString();
 
             if (email.isEmpty() || pass.isEmpty()) {
-                Toast.makeText(this, "Fill all fields", Toast.LENGTH_SHORT).show();
+                FamigoToast.warning(this, "Fill all fields");
                 return;
             }
 
@@ -61,13 +66,13 @@ public class MainActivity extends AppCompatActivity {
                         repo.persistTokens(response.body());
                         checkUserFamilies();   // 🔥 decide where to go next
                     } else {
-                        Toast.makeText(MainActivity.this, "Incorrect credentials", Toast.LENGTH_LONG).show();
+                        FamigoToast.error(MainActivity.this, "Incorrect credentials");
                     }
                 }
 
                 @Override
                 public void onFailure(Call<TokenOut> call, Throwable t) {
-                    Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
+                    FamigoToast.error(MainActivity.this, t.getMessage() != null ? t.getMessage() : "Login failed");
                 }
             });
         });
@@ -83,33 +88,22 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<List<FamilyOut>> call, Response<List<FamilyOut>> response) {
 
                 if (!response.isSuccessful() || response.body() == null) {
-                    Toast.makeText(MainActivity.this, "Failed to load families", Toast.LENGTH_LONG).show();
+                    FamigoToast.error(MainActivity.this, "Failed to load families");
                     return;
                 }
 
                 List<FamilyOut> families = response.body();
                 TokenStore tokenStore = new TokenStore(MainActivity.this);
 
-                if (families.isEmpty()) {
-                    // 👇 CHANGE: if user has NO family, go to HomeActivity
-                    // where they can choose Register OR Join.
-                    Intent i = new Intent(MainActivity.this, HomeActivity.class);
-                    startActivity(i);
-                    finish();
-                } else {
-                    // user already has at least one family → keep current behaviour
-                    tokenStore.saveFamilyId(families.get(0).id);
-
-                    Intent i = new Intent(MainActivity.this, StoreActivity.class);
-                    i.putExtra("FAMILY_ID", families.get(0).id);
-                    startActivity(i);
-                    finish();
-                }
+                // After login, always go to HomeActivity (which will show families if they have any)
+                Intent i = new Intent(MainActivity.this, HomeActivity.class);
+                startActivity(i);
+                finish();
             }
 
             @Override
             public void onFailure(Call<List<FamilyOut>> call, Throwable t) {
-                Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
+                FamigoToast.error(MainActivity.this, t.getMessage() != null ? t.getMessage() : "Failed to load families");
             }
         });
     }

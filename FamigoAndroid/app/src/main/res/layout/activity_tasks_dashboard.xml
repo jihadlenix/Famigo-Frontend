@@ -10,29 +10,24 @@
     tools:context=".TasksDashboardActivity">
 
     <!-- HEADER -->
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.cardview.widget.CardView
         android:id="@+id/header_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingTop="28dp"
-        android:paddingBottom="12dp"
+        android:elevation="2dp"
+        app:cardCornerRadius="0dp"
+        app:cardBackgroundColor="@color/white"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <ImageButton
-            android:id="@+id/button_add_task"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:background="@android:color/transparent"
-            android:padding="4dp"
-            android:contentDescription="@string/add_task"
-            android:src="@drawable/ic_add"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="@+id/text_header_title"
-            app:layout_constraintTop_toTopOf="@+id/text_header_title" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="16dp">
 
         <TextView
             android:id="@+id/text_header_title"
@@ -41,56 +36,55 @@
             android:text="@string/task_dashboard"
             android:textColor="@color/text_primary"
             android:textStyle="bold"
-            android:textSize="18sp"
+                android:textSize="22sp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/button_add_task"
-            app:layout_constraintEnd_toStartOf="@+id/button_search"
-            app:layout_constraintHorizontal_bias="0.5" />
-
-        <ImageButton
-            android:id="@+id/button_search"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:background="@android:color/transparent"
-            android:padding="4dp"
-            android:contentDescription="@string/search"
-            android:src="@drawable/ic_search"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="@id/text_header_title"
-            app:layout_constraintTop_toTopOf="@id/text_header_title" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
 
     <!-- COINS ROW -->
-    <LinearLayout
-        android:id="@+id/coins_container"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/coins_card"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="12dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="2dp"
+        app:cardBackgroundColor="@color/card_green"
         app:layout_constraintTop_toBottomOf="@id/header_container"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <LinearLayout
+            android:id="@+id/coins_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:gravity="center_vertical">
+
         <ImageView
             android:id="@+id/image_coin"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
             android:src="@drawable/ic_coin"
-            app:tint="@color/text_primary"
+                app:tint="@color/famigo_green_dark"
             android:contentDescription="@string/coins" />
 
         <TextView
             android:id="@+id/text_coins_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+                android:layout_marginStart="12dp"
             android:text="@string/coins"
             android:textColor="@color/text_primary"
-            android:textSize="14sp" />
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
         <View
             android:layout_width="0dp"
@@ -102,11 +96,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/coins_1250"
-            android:textColor="@color/text_primary"
-            android:textSize="16sp"
+                android:textColor="@color/famigo_green_dark"
+                android:textSize="20sp"
             android:textStyle="bold" />
 
     </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
     <!-- SCROLL CONTENT -->
     <ScrollView
@@ -114,8 +109,8 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"
-        app:layout_constraintTop_toBottomOf="@id/coins_container"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_nav"
+        app:layout_constraintTop_toBottomOf="@id/coins_card"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -128,33 +123,43 @@
             android:paddingBottom="16dp">
 
             <!-- My Tasks title + calendar -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="1dp"
+                app:cardBackgroundColor="@color/white">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingTop="8dp"
-                android:paddingBottom="4dp">
+                    android:padding="12dp">
 
                 <ImageButton
                     android:id="@+id/button_calendar"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:background="@android:color/transparent"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/bg_icon_button"
+                        android:padding="6dp"
                     android:contentDescription="@string/calendar"
                     android:src="@drawable/ic_calendar"
-                    app:tint="@color/text_primary" />
+                        app:tint="@color/famigo_green" />
 
                 <TextView
                     android:id="@+id/text_my_tasks_title"
-                    android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
                     android:text="@string/my_tasks"
                     android:textColor="@color/text_primary"
-                    android:textSize="16sp"
+                        android:textSize="18sp"
                     android:textStyle="bold" />
             </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_my_tasks"
@@ -162,16 +167,39 @@
                 android:layout_height="wrap_content"
                 tools:listitem="@layout/item_task_card"/>
 
+            <include
+                android:id="@+id/empty_my_tasks"
+                layout="@layout/empty_state_tasks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+
             <!-- Family Tasks title -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="1dp"
+                app:cardBackgroundColor="@color/white">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="12dp">
+
             <TextView
                 android:id="@+id/text_family_tasks_title"
-                android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/family_tasks"
                 android:textColor="@color/text_primary"
                 android:textStyle="bold"
-                android:textSize="16sp"
-                android:layout_marginBottom="8dp" />
+                        android:textSize="18sp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
             <!-- Family Task card -->
             <androidx.recyclerview.widget.RecyclerView
@@ -180,50 +208,37 @@
                 android:layout_height="wrap_content"
                 tools:listitem="@layout/item_task_card"/>
 
+            <include
+                android:id="@+id/empty_family_tasks"
+                layout="@layout/empty_state_tasks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+
         </LinearLayout>
     </ScrollView>
 
     <!-- BOTTOM NAV -->
-    <LinearLayout
-        android:id="@+id/bottom_nav"
+    <include
+        android:id="@+id/bottomNavigation"
+        layout="@layout/bottom_navigation_unified"
         android:layout_width="0dp"
-        android:layout_height="56dp"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:background="@android:color/white"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent" />
 
-        <ImageButton
-            android:id="@+id/nav_home"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:src="@drawable/ic_home"
-            android:contentDescription="@string/home"
-            app:tint="@color/text_primary" />
-
-        <ImageButton
-            android:id="@+id/nav_messages"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:src="@drawable/ic_mail"
-            android:contentDescription="@string/messages"
-            app:tint="@color/text_secondary" />
-
-        <ImageButton
-            android:id="@+id/nav_profile"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:src="@drawable/ic_profile"
-            android:contentDescription="@string/profile"
-            app:tint="@color/text_secondary" />
-    </LinearLayout>
+    <!-- FAB for Add Task -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_add_task"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_add"
+        android:contentDescription="@string/add_task"
+        app:tint="@android:color/white"
+        app:backgroundTint="@color/famigo_green"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

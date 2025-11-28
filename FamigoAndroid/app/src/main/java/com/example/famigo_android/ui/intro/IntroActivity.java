@@ -2,13 +2,14 @@ package com.example.famigo_android.ui.intro;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.famigo_android.R;
 import com.example.famigo_android.data.auth.AuthRepository;
-import com.example.famigo_android.ui.auth.WelcomeActivity;
+import com.example.famigo_android.ui.auth.MainActivity;
 import com.example.famigo_android.ui.family.HomeActivity;
 
 public class IntroActivity extends AppCompatActivity {
@@ -20,6 +21,11 @@ public class IntroActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_intro);
+
+        // Set status bar color to green
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(getColor(R.color.famigo_green_dark));
+        }
 
         viewPager = findViewById(R.id.viewPager);
         pagerAdapter = new IntroPagerAdapter(this);
@@ -48,15 +54,17 @@ public class IntroActivity extends AppCompatActivity {
             String accessToken = authRepo.getStore().getAccessToken();
             
             if (accessToken != null && !accessToken.isEmpty()) {
-                // User is logged in, go directly to HomeActivity
+                // User is logged in, go to HomeActivity (which will show their families)
                 startActivity(new Intent(this, HomeActivity.class));
+                finish();
             } else {
-                // User is not logged in, go to WelcomeActivity
-                startActivity(new Intent(this, WelcomeActivity.class));
+                // User is not logged in, go to login
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
             }
-            finish();
         }
     }
+    
 
     @Override
     public void onBackPressed() {

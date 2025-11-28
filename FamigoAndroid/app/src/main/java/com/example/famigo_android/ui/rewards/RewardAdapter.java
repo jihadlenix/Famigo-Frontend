@@ -47,8 +47,24 @@ public class RewardAdapter extends RecyclerView.Adapter<RewardAdapter.RewardView
         holder.title.setText(r.title);
         holder.cost.setText(r.cost_points + " pts");
 
+        // Show redeemed state
+        if (r.is_redeemed) {
+            // Gray out the item
+            holder.itemView.setAlpha(0.6f);
+            holder.redeemBtn.setText("✓ Redeemed");
+            holder.redeemBtn.setEnabled(false);
+            holder.redeemBtn.setAlpha(0.7f);
+        } else {
+            holder.itemView.setAlpha(1.0f);
+            holder.redeemBtn.setText("Redeem");
+            holder.redeemBtn.setEnabled(true);
+            holder.redeemBtn.setAlpha(1.0f);
+        }
+
         holder.redeemBtn.setOnClickListener(v -> {
-            if (listener != null) listener.onRedeemClick(r);
+            if (listener != null && !r.is_redeemed) {
+                listener.onRedeemClick(r);
+            }
         });
     }
 

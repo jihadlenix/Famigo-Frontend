@@ -9,6 +9,7 @@ public class Task {
     private String deadline;
     private String status;
     private int points_value;
+    private String category;
 
     public String getId() {
         return id;
@@ -39,6 +40,14 @@ public class Task {
     }
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
 }

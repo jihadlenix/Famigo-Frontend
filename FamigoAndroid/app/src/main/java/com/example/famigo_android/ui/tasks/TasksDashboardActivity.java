@@ -2,6 +2,7 @@ package com.example.famigo_android.ui.tasks;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,8 +18,13 @@ import com.example.famigo_android.data.tasks.PointsResponse;
 import com.example.famigo_android.data.tasks.Task;
 import com.example.famigo_android.data.tasks.TaskAdapter;
 import com.example.famigo_android.data.tasks.TaskApi;
-import com.example.famigo_android.ui.auth.ProfileActivity;
-import com.example.famigo_android.ui.rewards.StoreActivity;
+import com.example.famigo_android.data.user.MeOut;
+import com.example.famigo_android.data.user.UserRepository;
+import com.example.famigo_android.data.family.FamilyOut;
+import com.example.famigo_android.data.family.FamilyMemberOut;
+import com.example.famigo_android.data.family.FamilyRepository;
+import com.example.famigo_android.ui.NavigationHelper;
+import com.example.famigo_android.ui.utils.FamigoToast;
 
 import java.util.List;
 
@@ -38,15 +44,29 @@ public class TasksDashboardActivity extends AppCompatActivity {
 
     private String token;
     private String familyId;
+    private String currentUserId;
+    private boolean isCurrentUserParent = false;
 
     private TaskApi taskApi;
+    private UserRepository userRepo;
+    private FamilyRepository familyRepo;
+    
+    private View emptyMyTasks, emptyFamilyTasks;
+    private com.google.android.material.floatingactionbutton.FloatingActionButton addTaskButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tasks_dashboard);
 
+        // Set status bar color to green
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(getColor(R.color.famigo_green_dark));
+        }
+
         taskApi = ApiClient.getTasksApi();
+        userRepo = new UserRepository(this);
+        familyRepo = new FamilyRepository(this);
 
         tokenStore = new TokenStore(this);
         token = "Bearer " + tokenStore.getAccessToken();
@@ -58,30 +78,15 @@ public class TasksDashboardActivity extends AppCompatActivity {
         tokenStore.saveFamilyId(familyId);
 
         if (familyId == null) {
-            Toast.makeText(this, "Family ID missing!", Toast.LENGTH_LONG).show();
+            FamigoToast.error(this, "Family ID missing!");
             finish();
             return;
         }
 
-        ImageButton navHome = findViewById(R.id.nav_home);
-        ImageButton navMessages = findViewById(R.id.nav_messages);
-        ImageButton navProfile = findViewById(R.id.nav_profile);
+        // Setup unified bottom navigation
+        NavigationHelper.setupBottomNavigation(this, NavigationHelper.Tab.TASKS);
 
-        navHome.setColorFilter(getColor(R.color.text_primary));
-        navMessages.setColorFilter(getColor(R.color.text_secondary));
-        navProfile.setColorFilter(getColor(R.color.text_secondary));
-
-        navMessages.setOnClickListener(v -> {
-            Intent i = new Intent(TasksDashboardActivity.this, StoreActivity.class);
-            i.putExtra("FAMILY_ID", familyId);
-            startActivity(i);
-        });
-
-        navProfile.setOnClickListener(v -> {
-            startActivity(new Intent(TasksDashboardActivity.this, ProfileActivity.class));
-        });
-
-        ImageButton addTaskButton = findViewById(R.id.button_add_task);
+        addTaskButton = findViewById(R.id.button_add_task);
         ImageButton calendarButton = findViewById(R.id.button_calendar);
         textCoinsValue = findViewById(R.id.text_coins_value);
 
@@ -99,12 +104,68 @@ public class TasksDashboardActivity extends AppCompatActivity {
 
         recyclerMyTasks = findViewById(R.id.recycler_my_tasks);
         recyclerFamilyTasks = findViewById(R.id.recycler_family_tasks);
+        emptyMyTasks = findViewById(R.id.empty_my_tasks);
+        emptyFamilyTasks = findViewById(R.id.empty_family_tasks);
 
         recyclerMyTasks.setLayoutManager(new LinearLayoutManager(this));
         recyclerFamilyTasks.setLayoutManager(new LinearLayoutManager(this));
 
+        // Load current user to check role, then load tasks
+        loadCurrentUser();
         fetchCoins();
-        loadTasks();
+    }
+
+    private void loadCurrentUser() {
+        userRepo.getMe().enqueue(new Callback<MeOut>() {
+            @Override
+            public void onResponse(Call<MeOut> call, Response<MeOut> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    currentUserId = response.body().id;
+                    checkUserRole();
+                } else {
+                    // Still load tasks, just won't be able to check parent status
+                    loadTasks();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MeOut> call, Throwable t) {
+                // Still load tasks, just won't be able to check parent status
+                loadTasks();
+            }
+        });
+    }
+
+    private void checkUserRole() {
+        familyRepo.getFamilyById(familyId).enqueue(new Callback<FamilyOut>() {
+            @Override
+            public void onResponse(Call<FamilyOut> call, Response<FamilyOut> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    FamilyOut family = response.body();
+                    // Check if current user is a parent in this family
+                    if (family.members != null && currentUserId != null) {
+                        for (FamilyMemberOut member : family.members) {
+                            if (currentUserId.equals(member.user_id) && "PARENT".equalsIgnoreCase(member.role)) {
+                                isCurrentUserParent = true;
+                                break;
+                            }
+                        }
+                    }
+                    // Show/hide FAB based on role - only parents can add tasks
+                    if (addTaskButton != null) {
+                        addTaskButton.setVisibility(isCurrentUserParent ? View.VISIBLE : View.GONE);
+                    }
+                }
+                // Load tasks regardless
+                loadTasks();
+            }
+
+            @Override
+            public void onFailure(Call<FamilyOut> call, Throwable t) {
+                // Load tasks even if role check fails
+                loadTasks();
+            }
+        });
     }
 
     @Override
@@ -120,13 +181,21 @@ public class TasksDashboardActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<Task>> call, Response<List<Task>> response) {
                 if (response.isSuccessful()) {
+                    List<Task> tasks = response.body();
+                    if (tasks == null || tasks.isEmpty()) {
+                        emptyMyTasks.setVisibility(View.VISIBLE);
+                        recyclerMyTasks.setVisibility(View.GONE);
+                    } else {
+                        emptyMyTasks.setVisibility(View.GONE);
+                        recyclerMyTasks.setVisibility(View.VISIBLE);
                     myTasksAdapter = new TaskAdapter(
-                            response.body(),
+                                tasks,
                             "MY_TASKS",
                             token,
                             TasksDashboardActivity.this
                     );
                     recyclerMyTasks.setAdapter(myTasksAdapter);
+                    }
                 }
             }
 
@@ -138,13 +207,21 @@ public class TasksDashboardActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<List<Task>> call, Response<List<Task>> response) {
                         if (response.isSuccessful()) {
+                            List<Task> tasks = response.body();
+                            if (tasks == null || tasks.isEmpty()) {
+                                emptyFamilyTasks.setVisibility(View.VISIBLE);
+                                recyclerFamilyTasks.setVisibility(View.GONE);
+                            } else {
+                                emptyFamilyTasks.setVisibility(View.GONE);
+                                recyclerFamilyTasks.setVisibility(View.VISIBLE);
                             familyTasksAdapter = new TaskAdapter(
-                                    response.body(),
+                                        tasks,
                                     "FAMILY_TASKS",
                                     token,
                                     TasksDashboardActivity.this
                             );
                             recyclerFamilyTasks.setAdapter(familyTasksAdapter);
+                            }
                         }
                     }
 

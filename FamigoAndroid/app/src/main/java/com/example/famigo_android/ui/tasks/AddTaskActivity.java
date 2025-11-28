@@ -27,6 +27,7 @@ import com.example.famigo_android.data.user.MemberDto;
 import com.example.famigo_android.data.user.UserRepository;
 import com.example.famigo_android.ui.auth.ProfileActivity;
 import com.example.famigo_android.ui.rewards.StoreActivity;
+import com.example.famigo_android.ui.utils.FamigoToast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -61,6 +62,11 @@ public class AddTaskActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
 
+        // Set status bar color to green
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(getColor(R.color.famigo_green_dark));
+        }
+
         taskApi = ApiClient.getTasksApi();
         userRepo = new UserRepository(this);
 
@@ -72,7 +78,7 @@ public class AddTaskActivity extends AppCompatActivity {
             familyId = ts.getFamilyId();
         }
         if (familyId == null) {
-            Toast.makeText(this, "Family ID missing", Toast.LENGTH_LONG).show();
+            FamigoToast.error(this, "Family ID missing");
             finish();
             return;
         }
@@ -97,9 +103,6 @@ public class AddTaskActivity extends AppCompatActivity {
         // Submit
         submitButton.setOnClickListener(v -> submitTask());
 
-        // Bottom nav
-        setupBottomNav();
-
         // Load family members into spinner
         loadMembers();
     }
@@ -123,30 +126,6 @@ public class AddTaskActivity extends AppCompatActivity {
         ).show();
     }
 
-    private void setupBottomNav() {
-        ImageButton navHome     = findViewById(R.id.nav_home);
-        ImageButton navMessages = findViewById(R.id.nav_messages);
-        ImageButton navProfile  = findViewById(R.id.nav_profile);
-
-        navHome.setOnClickListener(v -> {
-            Intent i = new Intent(AddTaskActivity.this, TasksDashboardActivity.class);
-            i.putExtra("FAMILY_ID", familyId);
-            startActivity(i);
-            finish();
-        });
-
-        navMessages.setOnClickListener(v -> {
-            Intent i = new Intent(AddTaskActivity.this, StoreActivity.class);
-            i.putExtra("FAMILY_ID", familyId);
-            startActivity(i);
-            finish();
-        });
-
-        navProfile.setOnClickListener(v -> {
-            startActivity(new Intent(AddTaskActivity.this, ProfileActivity.class));
-            finish();
-        });
-    }
 
     // -------------------------------------------------------------
     // Load members for the current family into Spinner
@@ -156,8 +135,7 @@ public class AddTaskActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<MeOut> call, Response<MeOut> response) {
                 if (!response.isSuccessful() || response.body() == null) {
-                    Toast.makeText(AddTaskActivity.this,
-                            "Failed to load members", Toast.LENGTH_SHORT).show();
+                    FamigoToast.error(AddTaskActivity.this, "Failed to load members");
                     return;
                 }
 
@@ -175,8 +153,7 @@ public class AddTaskActivity extends AppCompatActivity {
                 }
 
                 if (target == null || target.members == null || target.members.isEmpty()) {
-                    Toast.makeText(AddTaskActivity.this,
-                            "No members in this family", Toast.LENGTH_SHORT).show();
+                    FamigoToast.warning(AddTaskActivity.this, "No members in this family");
                     return;
                 }
 
@@ -219,9 +196,8 @@ public class AddTaskActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<MeOut> call, Throwable t) {
-                Toast.makeText(AddTaskActivity.this,
-                        "Error loading members: " + t.getMessage(),
-                        Toast.LENGTH_SHORT).show();
+                FamigoToast.error(AddTaskActivity.this,
+                        "Error loading members: " + (t.getMessage() != null ? t.getMessage() : "Unknown error"));
             }
         });
     }
@@ -236,13 +212,13 @@ public class AddTaskActivity extends AppCompatActivity {
         String pointsStr   = inputPoints.getText().toString().trim();
 
         if (title.isEmpty() || pointsStr.isEmpty() || selectedISODate == null) {
-            Toast.makeText(this, "Please fill all required fields.", Toast.LENGTH_SHORT).show();
+            FamigoToast.warning(this, "Please fill all required fields");
             return;
         }
 
         int selectedIndex = spinnerAssigned.getSelectedItemPosition();
         if (selectedIndex < 0 || selectedIndex >= memberIds.size()) {
-            Toast.makeText(this, "Please choose who will do the task.", Toast.LENGTH_SHORT).show();
+            FamigoToast.warning(this, "Please choose who will do the task");
             return;
         }
 
@@ -250,7 +226,7 @@ public class AddTaskActivity extends AppCompatActivity {
         try {
             points = Integer.parseInt(pointsStr);
         } catch (NumberFormatException e) {
-            Toast.makeText(this, "Points must be a number.", Toast.LENGTH_SHORT).show();
+            FamigoToast.warning(this, "Points must be a number");
             return;
         }
 
@@ -269,8 +245,7 @@ public class AddTaskActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<Task> call, Response<Task> response) {
                         if (!response.isSuccessful() || response.body() == null) {
-                            Toast.makeText(AddTaskActivity.this,
-                                    "Failed to create task.", Toast.LENGTH_SHORT).show();
+                            FamigoToast.error(AddTaskActivity.this, "Failed to create task");
                             return;
                         }
 
@@ -285,32 +260,26 @@ public class AddTaskActivity extends AppCompatActivity {
                                     public void onResponse(Call<Void> call,
                                                            Response<Void> response) {
                                         if (!response.isSuccessful()) {
-                                            Toast.makeText(AddTaskActivity.this,
-                                                    "Task created but NOT assigned.",
-                                                    Toast.LENGTH_SHORT).show();
+                                            FamigoToast.warning(AddTaskActivity.this, "Task created but NOT assigned");
                                             return;
                                         }
 
-                                        Toast.makeText(AddTaskActivity.this,
-                                                "Task added successfully!",
-                                                Toast.LENGTH_SHORT).show();
+                                        FamigoToast.success(AddTaskActivity.this, "Task added successfully!");
                                         finish();
                                     }
 
                                     @Override
                                     public void onFailure(Call<Void> call, Throwable t) {
-                                        Toast.makeText(AddTaskActivity.this,
-                                                "Assign failed: " + t.getMessage(),
-                                                Toast.LENGTH_SHORT).show();
+                                        FamigoToast.error(AddTaskActivity.this,
+                                                "Assign failed: " + (t.getMessage() != null ? t.getMessage() : "Unknown error"));
                                     }
                                 });
                     }
 
                     @Override
                     public void onFailure(Call<Task> call, Throwable t) {
-                        Toast.makeText(AddTaskActivity.this,
-                                "Error: " + t.getMessage(),
-                                Toast.LENGTH_SHORT).show();
+                        FamigoToast.error(AddTaskActivity.this,
+                                "Error: " + (t.getMessage() != null ? t.getMessage() : "Unknown error"));
                     }
                 });
     }

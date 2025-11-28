@@ -52,4 +52,21 @@
     <string name="project_kickoff_meeting">Project Kickoff Meeting</string>
 
     <string name="coins_50">50</string>
+
+    <!-- Intro Slider -->
+    <string name="intro_title_1">Welcome to Family Hub</string>
+    <string name="intro_description_1">Manage tasks, set goals, and celebrate achievements together.</string>
+    <string name="intro_title_2">Assign Tasks</string>
+    <string name="intro_description_2">Select tasks for each family member.</string>
+    <string name="intro_title_3">Meet your AI assistant</string>
+    <string name="intro_description_3">Our AI helps you assign tasks, determine points, and suggest who should take on the task.</string>
+    <string name="intro_title_4">You\'ve earned a reward!</string>
+    <string name="intro_description_4">Your points have transformed into a gift box! Tap to open and see what you\'ve earned.</string>
+    <string name="intro_next">Next</string>
+    <string name="intro_get_started">Get Started</string>
+
+    <!-- Tasks -->
+    <string name="task_clean_room">Clean your room</string>
+    <string name="task_homework">Do your homework</string>
+    <string name="task_help_dinner">Help with dinner</string>
 </resources>

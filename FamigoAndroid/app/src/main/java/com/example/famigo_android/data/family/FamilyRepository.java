@@ -35,4 +35,8 @@ public class FamilyRepository {
         return api.getMyFamilies(bearer());
     }
 
+    public Call<FamilyOut> getFamilyById(String familyId) {
+        return api.getFamilyById(bearer(), familyId);
+    }
+
 }

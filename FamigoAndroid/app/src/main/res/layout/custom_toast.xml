@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginBottom="24dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="12dp"
+    app:cardBackgroundColor="@android:color/white">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="14dp"
+        android:minWidth="200dp"
+        android:maxWidth="300dp">
+
+        <TextView
+            android:id="@+id/toastIcon"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:text="✓"
+            android:textSize="20sp"
+            android:textColor="@color/famigo_green"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginEnd="14dp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/toastMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Toast message"
+            android:textSize="15sp"
+            android:textColor="@color/text_primary"
+            android:textStyle="normal"
+            android:maxLines="3"
+            android:ellipsize="end"
+            android:lineSpacingExtra="2dp" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
+

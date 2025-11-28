@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.famigo_android.R;
 import com.example.famigo_android.data.auth.AuthRepository;
 import com.example.famigo_android.data.auth.UserOut;
+import com.example.famigo_android.ui.utils.FamigoToast;
 
 import java.io.IOException;
 
@@ -31,10 +32,14 @@ public class SignupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
+        // Set status bar color to green
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(getColor(R.color.famigo_green_dark));
+        }
+
         repo = new AuthRepository(this);
 
         fullNameEt = findViewById(R.id.fullNameEt);
-        usernameEt = findViewById(R.id.usernameEt);   // ✅ added
         emailEt = findViewById(R.id.emailEt);
         passwordEt = findViewById(R.id.passwordEt);
         confirmPasswordEt = findViewById(R.id.confirmPasswordEt);
@@ -44,37 +49,36 @@ public class SignupActivity extends AppCompatActivity {
 
         signupBtn.setOnClickListener(v -> {
             String fullName = fullNameEt.getText().toString().trim();
-            String username = usernameEt.getText().toString().trim();   // ✅ added
             String email = emailEt.getText().toString().trim();
             String pass = passwordEt.getText().toString();
             String confirm = confirmPasswordEt.getText().toString();
             String ageStr = ageEt.getText().toString().trim();
 
             if (!termsCheck.isChecked()) {
-                Toast.makeText(this, "You must accept the terms", Toast.LENGTH_SHORT).show();
+                FamigoToast.warning(this, "You must accept the terms");
                 return;
             }
             if (fullName.isEmpty() || email.isEmpty() || pass.isEmpty() || confirm.isEmpty() || ageStr.isEmpty()) {
-                Toast.makeText(this, "Fill all required fields", Toast.LENGTH_SHORT).show();
+                FamigoToast.warning(this, "Fill all required fields");
                 return;
             }
             if (!pass.equals(confirm)) {
-                Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show();
+                FamigoToast.warning(this, "Passwords do not match");
                 return;
             }
 
             // Parse age (required field)
             int age;
-            try {
-                age = Integer.parseInt(ageStr);
-                if (age < 0 || age > 120) {
-                    Toast.makeText(this, "Please enter a valid age (0-120)", Toast.LENGTH_SHORT).show();
+                try {
+                    age = Integer.parseInt(ageStr);
+                    if (age < 0 || age > 120) {
+                        FamigoToast.warning(this, "Please enter a valid age (0-120)");
+                        return;
+                    }
+                } catch (NumberFormatException e) {
+                    FamigoToast.warning(this, "Please enter a valid age");
                     return;
                 }
-            } catch (NumberFormatException e) {
-                Toast.makeText(this, "Please enter a valid age", Toast.LENGTH_SHORT).show();
-                return;
-            }
 
             Log.d("SignupActivity", "Attempting signup - Email: " + email + ", Age: " + age);
             
@@ -83,7 +87,7 @@ public class SignupActivity extends AppCompatActivity {
                 public void onResponse(Call<UserOut> call, Response<UserOut> response) {
                     if (response.isSuccessful()) {
                         Log.d("SignupActivity", "Signup successful");
-                        Toast.makeText(SignupActivity.this, "Account created! Please login.", Toast.LENGTH_LONG).show();
+                        FamigoToast.success(SignupActivity.this, "Account created! Please login.");
                         finish();
                     } else {
                         // Log error details
@@ -119,7 +123,7 @@ public class SignupActivity extends AppCompatActivity {
                             errorMessage = "Signup failed (Status: " + response.code() + ")";
                         }
                         
-                        Toast.makeText(SignupActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                        FamigoToast.error(SignupActivity.this, errorMessage);
                     }
                 }
 
@@ -130,7 +134,7 @@ public class SignupActivity extends AppCompatActivity {
                     if (errorMsg == null || errorMsg.isEmpty()) {
                         errorMsg = "Network error. Check your connection and backend URL.";
                     }
-                    Toast.makeText(SignupActivity.this, "Error: " + errorMsg, Toast.LENGTH_LONG).show();
+                    FamigoToast.error(SignupActivity.this, "Error: " + errorMsg);
                 }
             });
         });

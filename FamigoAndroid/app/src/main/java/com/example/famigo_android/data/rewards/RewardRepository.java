@@ -15,7 +15,8 @@ public class RewardRepository {
     private final TokenStore store;
 
     public RewardRepository(Context ctx) {
-        api = ApiClient.getRewardApi();
+        // Cast to the correct RewardApi type from this package
+        api = (RewardApi) ApiClient.getRewardApi();
         store = new TokenStore(ctx);
     }
 
@@ -36,5 +37,9 @@ public class RewardRepository {
 
     public Call<SimpleRedeemResponse> redeemRewardNow(String rewardId) {
         return api.redeemInstant(bearer(), rewardId);
+    }
+
+    public Call<List<RedemptionOut>> getMemberRedemptions(String familyId, String memberId) {
+        return api.getMemberRedemptions(bearer(), familyId, memberId);
     }
 }

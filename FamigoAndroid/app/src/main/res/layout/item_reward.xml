@@ -86,7 +86,7 @@
                     android:text="50 pts"
                     android:textStyle="bold"
                     android:textSize="14sp"
-                    android:textColor="#6366F1" />
+                    android:textColor="@color/famigo_green_dark" />
 
             </LinearLayout>
 

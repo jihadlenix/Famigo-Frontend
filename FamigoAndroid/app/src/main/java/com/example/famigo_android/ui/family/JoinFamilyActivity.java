@@ -13,6 +13,7 @@ import com.example.famigo_android.R;
 import com.example.famigo_android.data.family.FamilyRepository;
 import com.example.famigo_android.data.family.MemberOut;
 import com.example.famigo_android.ui.rewards.StoreActivity;
+import com.example.famigo_android.ui.utils.FamigoToast;
 
 import java.io.IOException;
 
@@ -31,6 +32,11 @@ public class JoinFamilyActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join_family);
 
+        // Set status bar color to green
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(getColor(R.color.famigo_green_dark));
+        }
+
         repo = new FamilyRepository(this);
 
         secretCodeEt = findViewById(R.id.secretCodeEt);
@@ -39,7 +45,7 @@ public class JoinFamilyActivity extends AppCompatActivity {
         joinBtn.setOnClickListener(v -> {
             String code = secretCodeEt.getText().toString().trim();
             if (code.isEmpty()) {
-                Toast.makeText(this, "Enter secret code", Toast.LENGTH_SHORT).show();
+                FamigoToast.warning(this, "Enter secret code");
                 return;
             }
 
@@ -51,7 +57,7 @@ public class JoinFamilyActivity extends AppCompatActivity {
                 public void onResponse(Call<MemberOut> call, Response<MemberOut> response) {
                     if (response.isSuccessful() && response.body() != null) {
                         MemberOut member = response.body();
-                        Toast.makeText(JoinFamilyActivity.this, "Joined family!", Toast.LENGTH_LONG).show();
+                        FamigoToast.success(JoinFamilyActivity.this, "Joined family!");
                         
                         // Finish activity after successful join
                         finish();
@@ -82,7 +88,7 @@ public class JoinFamilyActivity extends AppCompatActivity {
                             errorMessage = "Already a member of this family";
                         }
                         
-                        Toast.makeText(JoinFamilyActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                        FamigoToast.error(JoinFamilyActivity.this, errorMessage);
                     }
                 }
 
@@ -93,7 +99,7 @@ public class JoinFamilyActivity extends AppCompatActivity {
                     if (errorMsg == null || errorMsg.isEmpty()) {
                         errorMsg = "Network error. Check your connection and backend URL.";
                     }
-                    Toast.makeText(JoinFamilyActivity.this, errorMsg, Toast.LENGTH_LONG).show();
+                    FamigoToast.error(JoinFamilyActivity.this, errorMsg);
                 }
             });
         });
